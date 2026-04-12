@@ -3,14 +3,16 @@ import { DashboardPage } from "@/components/dashboard/dashboard-page";
 
 export default function DashboardRoutePage() {
   return (
+    <div className="min-h-full bg-background">
     <Suspense
       fallback={
         <div className="mx-auto flex min-h-full max-w-3xl flex-1 flex-col px-4 py-12 sm:px-6">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading…</p>
+          <p className="text-sm text-muted-foreground">Loading…</p>
         </div>
       }
     >
       <DashboardPage />
     </Suspense>
+    </div>
   );
 }

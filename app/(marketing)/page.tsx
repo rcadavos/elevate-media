@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Button } from "@/components/ui/button";
 
 const pillars = [
   {
@@ -46,37 +47,42 @@ const modules = [
 
 export default function Home() {
   return (
-    <div className="flex flex-1 flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
-      <header className="sticky top-0 z-20 border-b border-zinc-200/80 bg-white/85 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/85">
+    <div className="flex flex-1 flex-col bg-background text-foreground">
+      <header className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/80">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
           <Link href="/" className="group flex items-baseline gap-2">
             <span className="text-sm font-semibold tracking-tight transition group-hover:text-violet-700 dark:group-hover:text-violet-300">
               elev8temedia
             </span>
-            <span className="hidden text-xs font-medium text-zinc-400 sm:inline dark:text-zinc-500">
+            <span className="hidden text-xs font-medium text-muted-foreground sm:inline">
               E‑commerce growth
             </span>
           </Link>
           <nav className="flex items-center gap-1.5 sm:gap-2">
             <ThemeToggle compact />
-            <Link
-              href="/login"
-              className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-white"
+            <Button
+              render={<Link href="/login" />}
+              nativeButton={false}
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground"
             >
               Sign in
-            </Link>
-            <Link
-              href="/signup"
-              className="rounded-lg bg-violet-600 px-3 py-2 text-sm font-semibold text-white shadow-sm shadow-violet-600/20 transition hover:bg-violet-500 sm:px-4"
+            </Button>
+            <Button
+              render={<Link href="/signup" />}
+              nativeButton={false}
+              size="sm"
+              className="sm:px-4"
             >
               Get started
-            </Link>
+            </Button>
           </nav>
         </div>
       </header>
 
       <main className="flex-1">
-        <section className="relative overflow-hidden border-b border-zinc-200/80 dark:border-zinc-800">
+        <section className="relative overflow-hidden border-b border-border">
           <div
             className="pointer-events-none absolute inset-0 opacity-50 dark:opacity-35"
             aria-hidden
@@ -93,34 +99,39 @@ export default function Home() {
             <h1 className="mt-6 max-w-4xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl sm:leading-[1.06] lg:text-[3.25rem]">
               The quiet command center for brands you scale.
             </h1>
-            <p className="mt-6 max-w-2xl text-pretty text-base leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-lg sm:leading-relaxed">
+            <p className="mt-6 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg sm:leading-relaxed">
               elev8temedia helps e‑commerce teams turn paid social, SMS, and
               site optimization into repeatable growth. This workspace is where
               your pod plans the week, protects margin, and keeps every client
               story coherent — from first touch to finance.
             </p>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link
-                href="/signup"
-                className="inline-flex items-center justify-center rounded-xl bg-violet-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-violet-600/30 transition hover:bg-violet-500 hover:shadow-violet-600/40"
+              <Button
+                render={<Link href="/signup" />}
+                nativeButton={false}
+                size="lg"
+                className="rounded-xl px-6 py-3.5 text-sm shadow-lg"
               >
                 Start your workspace
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center rounded-xl border border-zinc-200/90 bg-white/90 px-6 py-3.5 text-sm font-semibold text-zinc-800 backdrop-blur-sm transition hover:bg-white dark:border-zinc-700 dark:bg-zinc-900/80 dark:text-zinc-100 dark:hover:bg-zinc-900"
+              </Button>
+              <Button
+                render={<Link href="/login" />}
+                nativeButton={false}
+                variant="outline"
+                size="lg"
+                className="rounded-xl border-border bg-card/90 px-6 py-3.5 text-sm font-semibold text-foreground backdrop-blur-sm hover:bg-card"
               >
                 Sign in to elev8temedia
-              </Link>
+              </Button>
             </div>
-            <p className="mt-5 max-w-xl text-xs leading-relaxed text-zinc-500 dark:text-zinc-500 sm:text-sm">
+            <p className="mt-5 max-w-xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
               No clutter. No “where did that number come from?” moments. Just a
               layout your team will actually open before coffee goes cold.
             </p>
           </div>
         </section>
 
-        <section className="border-b border-zinc-200/70 bg-white py-14 dark:border-zinc-800 dark:bg-zinc-900/35">
+        <section className="border-b border-border bg-muted/30 py-14">
           <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:grid-cols-3 sm:gap-8 sm:px-6">
             {pillars.map((p) => (
               <div key={p.title} className="relative pl-4 sm:pl-5">
@@ -128,10 +139,10 @@ export default function Home() {
                   className="absolute left-0 top-1.5 h-[calc(100%-0.25rem)] w-0.5 rounded-full bg-gradient-to-b from-violet-500 to-fuchsia-500 opacity-80"
                   aria-hidden
                 />
-                <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+                <h2 className="text-base font-semibold tracking-tight text-foreground">
                   {p.title}
                 </h2>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                   {p.body}
                 </p>
               </div>
@@ -147,7 +158,7 @@ export default function Home() {
             <h2 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
               Modules shaped like your week — not like generic software.
             </h2>
-            <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-base">
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
               Each surface is designed to be edited in place, scanned in seconds,
               and expanded when you are ready for deeper reporting and
               automation.
@@ -157,15 +168,15 @@ export default function Home() {
             {modules.map((m, i) => (
               <li
                 key={m.name}
-                className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200/90 bg-white p-5 shadow-sm transition hover:border-violet-300/80 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900/70 dark:hover:border-violet-500/25"
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md"
               >
-                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <h3 className="mt-2 text-base font-semibold text-zinc-900 dark:text-zinc-50">
+                <h3 className="mt-2 text-base font-semibold text-foreground">
                   {m.name}
                 </h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
                   {m.description}
                 </p>
                 <span className="mt-4 text-xs font-medium text-violet-600 opacity-0 transition group-hover:opacity-100 dark:text-violet-400">
@@ -176,7 +187,7 @@ export default function Home() {
           </ul>
         </section>
 
-        <section className="relative overflow-hidden border-t border-zinc-200/80 bg-gradient-to-br from-zinc-900 via-zinc-900 to-violet-950 py-16 text-white dark:border-zinc-800">
+        <section className="relative overflow-hidden border-t border-border bg-gradient-to-br from-zinc-900 via-zinc-900 to-violet-950 py-16 text-white dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-950">
           <div
             className="pointer-events-none absolute inset-0 opacity-40"
             aria-hidden
@@ -188,31 +199,36 @@ export default function Home() {
               <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
                 Bring the team. We will meet you at clarity.
               </h2>
-              <p className="mt-3 text-sm leading-relaxed text-zinc-300 sm:text-base">
+              <p className="mt-3 text-sm leading-relaxed text-white/80 sm:text-base">
                 Whether you are protecting a handful of hero accounts or scaling
                 a roster, this is the calm layer that keeps revenue, delivery,
                 and sales honest with each other.
               </p>
             </div>
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:min-w-[200px]">
-              <Link
-                href="/signup"
-                className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-zinc-900 shadow-lg transition hover:bg-zinc-100"
+              <Button
+                render={<Link href="/signup" />}
+                nativeButton={false}
+                size="lg"
+                className="rounded-xl bg-white px-5 py-3.5 text-sm font-semibold text-zinc-900 shadow-lg hover:bg-zinc-100"
               >
                 Create an account
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center rounded-xl border border-white/25 bg-white/5 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10"
+              </Button>
+              <Button
+                render={<Link href="/login" />}
+                nativeButton={false}
+                variant="outline"
+                size="lg"
+                className="rounded-xl border-white/25 bg-white/5 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/10"
               >
                 I already have access
-              </Link>
+              </Button>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-zinc-200/80 bg-zinc-50 py-8 text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-500">
+      <footer className="border-t border-border bg-muted/30 py-8 text-sm text-muted-foreground">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p>© {new Date().getFullYear()} elev8temedia. All rights reserved.</p>
           <p className="text-xs sm:text-sm">

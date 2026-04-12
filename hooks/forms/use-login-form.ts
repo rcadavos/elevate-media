@@ -4,8 +4,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { getPostSignInRedirectPath } from "@/lib/auth/post-sign-in-redirect";
 import { createClient } from "@/lib/supabase/client";
-import { mapAuthUrlError } from "@/lib/forms/map-auth-url-error";
+import {
+  mapAuthClientMutationError,
+  mapAuthUrlError,
+} from "@/lib/forms/map-auth-url-error";
 import { queryKeys } from "@/lib/query/query-keys";
 
 export type LoginFormValues = {
@@ -51,10 +55,12 @@ export function useLoginForm({ urlError }: UseLoginFormOptions) {
       }
     },
     onSuccess: async () => {
+      const supabase = createClient();
+      const path = await getPostSignInRedirectPath(supabase);
       await queryClient.invalidateQueries({
         queryKey: queryKeys.me.sessionSummary(),
       });
-      router.push("/dashboard");
+      router.push(path);
       router.refresh();
     },
   });
@@ -72,10 +78,7 @@ export function useLoginForm({ urlError }: UseLoginFormOptions) {
       onError: (err) => {
         setError("root", {
           type: "server",
-          message:
-            err instanceof Error
-              ? err.message
-              : "Something went wrong. Try again.",
+          message: mapAuthClientMutationError(err),
         });
       },
     });

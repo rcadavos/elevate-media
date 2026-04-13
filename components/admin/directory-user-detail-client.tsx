@@ -285,8 +285,8 @@ export function DirectoryUserDetailClient({
         <Card>
           <CardContent className="space-y-0 p-6 sm:p-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
-                <div className="shrink-0">
+              <div className="flex min-w-0 flex-1 flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:gap-5 sm:text-left">
+                <div className="shrink-0 self-center sm:self-auto">
                   <ClientProfilePhotoSlot
                     kind="business_logo"
                     url={displayProfile.business_logo_url}
@@ -295,59 +295,77 @@ export function DirectoryUserDetailClient({
                     onPickFile={(file) => handleAdminProfilePhoto("business_logo", file)}
                   />
                 </div>
-                <div className="min-w-0 flex-1 space-y-1">
+                <div className="w-full min-w-0 flex-1 space-y-1 sm:w-auto">
                   {editing ? (
-                    <div className="space-y-1.5">
-                      <Label
-                        htmlFor={`dir-client-business-${initialProfile.id}`}
-                        className="text-xs text-muted-foreground"
-                      >
-                        Business name
-                      </Label>
-                      <Input
-                        id={`dir-client-business-${initialProfile.id}`}
-                        value={draftBusinessName}
-                        onChange={(e) => setDraftBusinessName(e.target.value)}
-                        disabled={patchMutation.isPending}
-                        autoComplete="organization"
-                        className="text-lg font-semibold"
-                      />
-                    </div>
+                    <Input
+                      id={`dir-client-business-${initialProfile.id}`}
+                      value={draftBusinessName}
+                      onChange={(e) => setDraftBusinessName(e.target.value)}
+                      disabled={patchMutation.isPending}
+                      autoComplete="organization"
+                      placeholder="Business name"
+                      aria-label="Business name"
+                      className="text-center text-lg font-semibold sm:text-left"
+                    />
                   ) : (
                     <p className="truncate text-xl font-semibold tracking-tight text-foreground">
                       {businessDisplay}
                     </p>
                   )}
-                  <p className="font-mono text-xs text-muted-foreground break-all">
+                  <p className="font-mono text-xs text-muted-foreground break-all text-center sm:text-left">
                     {displayProfile.id}
                   </p>
                 </div>
               </div>
-              <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="toolbar"
-                  disabled={sendMutation.isPending}
-                  onClick={() => {
-                    setSendError(null);
-                    setNotice(null);
-                    setInviteUrl(null);
-                    sendMutation.mutate();
-                  }}
-                >
-                  {sendMutation.isPending ? "Working…" : resendLabel}
-                </Button>
+              <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
                 {!editing ? (
-                  <Button type="button" size="toolbar" onClick={startEdit}>
-                    Edit
-                  </Button>
+                  <div className="flex w-full gap-2 sm:contents">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="toolbar"
+                      disabled={sendMutation.isPending}
+                      className="min-h-11 min-w-0 flex-1 basis-0 sm:h-9 sm:flex-none sm:basis-auto"
+                      onClick={() => {
+                        setSendError(null);
+                        setNotice(null);
+                        setInviteUrl(null);
+                        sendMutation.mutate();
+                      }}
+                    >
+                      {sendMutation.isPending ? "Working…" : resendLabel}
+                    </Button>
+                    <Button
+                      type="button"
+                      size="toolbar"
+                      className="min-h-11 min-w-0 flex-1 basis-0 sm:h-9 sm:flex-none sm:basis-auto"
+                      onClick={startEdit}
+                    >
+                      Edit
+                    </Button>
+                  </div>
                 ) : (
-                  <>
+                  <div className="flex w-full gap-2 sm:contents">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="toolbar"
+                      disabled={sendMutation.isPending}
+                      className="min-h-11 min-w-0 flex-[2] basis-0 sm:h-9 sm:flex-none sm:basis-auto"
+                      onClick={() => {
+                        setSendError(null);
+                        setNotice(null);
+                        setInviteUrl(null);
+                        sendMutation.mutate();
+                      }}
+                    >
+                      {sendMutation.isPending ? "Working…" : resendLabel}
+                    </Button>
                     <Button
                       type="button"
                       size="toolbar"
                       disabled={patchMutation.isPending}
+                      className="min-h-11 min-w-0 flex-1 basis-0 sm:h-9 sm:flex-none sm:basis-auto"
                       onClick={() => patchMutation.mutate()}
                     >
                       {patchMutation.isPending ? "Saving…" : "Save"}
@@ -357,11 +375,12 @@ export function DirectoryUserDetailClient({
                       variant="ghost"
                       size="toolbar"
                       disabled={patchMutation.isPending}
+                      className="min-h-11 min-w-0 flex-1 basis-0 sm:h-9 sm:flex-none sm:basis-auto"
                       onClick={cancelEdit}
                     >
                       Cancel
                     </Button>
-                  </>
+                  </div>
                 )}
               </div>
             </div>
@@ -479,21 +498,11 @@ export function DirectoryUserDetailClient({
               </div>
 
               <div className="grid grid-cols-1 gap-1 sm:grid-cols-[minmax(0,11rem)_1fr] sm:items-start sm:gap-6">
-                <Label
-                  htmlFor={`dir-client-date-added-${initialProfile.id}`}
-                  className="text-sm text-muted-foreground sm:pt-2"
-                >
-                  Date added
-                </Label>
+                <div className="text-sm text-muted-foreground sm:pt-2">Date added</div>
                 <div className="min-w-0">
-                  <Input
-                    id={`dir-client-date-added-${initialProfile.id}`}
-                    readOnly
-                    disabled
-                    value={dateAddedLabel}
-                    className="max-w-md cursor-not-allowed bg-muted/50 font-medium text-muted-foreground opacity-100"
-                    tabIndex={-1}
-                  />
+                  <p className="text-sm font-medium text-foreground sm:pt-2">
+                    {dateAddedLabel}
+                  </p>
                 </div>
               </div>
             </div>
@@ -737,21 +746,11 @@ export function DirectoryUserDetailClient({
             </div>
 
             <div className="grid grid-cols-1 gap-1 sm:grid-cols-[minmax(0,11rem)_1fr] sm:items-start sm:gap-6">
-              <Label
-                htmlFor={`dir-staff-date-added-${initialProfile.id}`}
-                className="text-sm text-muted-foreground sm:pt-2"
-              >
-                Date added
-              </Label>
+              <div className="text-sm text-muted-foreground sm:pt-2">Date added</div>
               <div className="min-w-0">
-                <Input
-                  id={`dir-staff-date-added-${initialProfile.id}`}
-                  readOnly
-                  disabled
-                  value={staffDateAddedLabel}
-                  className="max-w-md cursor-not-allowed bg-muted/50 font-medium text-muted-foreground opacity-100"
-                  tabIndex={-1}
-                />
+                <p className="text-sm font-medium text-foreground sm:pt-2">
+                  {staffDateAddedLabel}
+                </p>
               </div>
             </div>
           </div>

@@ -305,7 +305,7 @@ export function DirectoryUserDetailClient({
                       autoComplete="organization"
                       placeholder="Business name"
                       aria-label="Business name"
-                      className="text-center text-lg font-semibold sm:text-left"
+                      className="h-11 min-h-11 shrink-0 py-1 text-center text-lg font-semibold leading-tight sm:h-9 sm:py-1 sm:text-left"
                     />
                   ) : (
                     <p className="truncate text-xl font-semibold tracking-tight text-foreground">
@@ -565,8 +565,8 @@ export function DirectoryUserDetailClient({
       <Card>
         <CardContent className="space-y-0 p-6 sm:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
-              <div className="shrink-0">
+            <div className="flex min-w-0 flex-1 flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:gap-5 sm:text-left">
+              <div className="shrink-0 self-center sm:self-auto">
                 <ClientProfilePhotoSlot
                   kind="avatar"
                   url={displayProfile.avatar_url}
@@ -576,33 +576,27 @@ export function DirectoryUserDetailClient({
                   onPickFile={(file) => handleAdminProfilePhoto("avatar", file)}
                 />
               </div>
-              <div className="min-w-0 flex-1 space-y-1">
+              <div className="w-full min-w-0 flex-1 space-y-1 sm:w-auto">
                 {editing ? (
-                  <div className="space-y-1.5">
-                    <Label
-                      htmlFor={`dir-staff-name-${initialProfile.id}`}
-                      className="text-xs text-muted-foreground"
-                    >
-                      Full name
-                    </Label>
-                    <Input
-                      id={`dir-staff-name-${initialProfile.id}`}
-                      value={draftName}
-                      onChange={(e) => setDraftName(e.target.value)}
-                      disabled={patchMutation.isPending}
-                      autoComplete="name"
-                      className="text-lg font-semibold"
-                    />
-                  </div>
+                  <Input
+                    id={`dir-staff-name-${initialProfile.id}`}
+                    value={draftName}
+                    onChange={(e) => setDraftName(e.target.value)}
+                    disabled={patchMutation.isPending}
+                    autoComplete="name"
+                    placeholder="Full name"
+                    aria-label="Full name"
+                    className="h-11 min-h-11 shrink-0 py-1 text-center text-lg font-semibold leading-tight sm:h-9 sm:py-1 sm:text-left"
+                  />
                 ) : (
                   <p className="truncate text-xl font-semibold tracking-tight text-foreground">
                     {staffNameDisplay}
                   </p>
                 )}
-                <p className="break-all font-mono text-xs text-muted-foreground">
+                <p className="break-all text-center font-mono text-xs text-muted-foreground sm:text-left">
                   {displayProfile.id}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-center text-xs text-muted-foreground sm:text-left">
                   <span className="font-medium text-foreground">{segmentLabel}</span>
                   {" · "}
                   <span
@@ -617,31 +611,55 @@ export function DirectoryUserDetailClient({
                 </p>
               </div>
             </div>
-            <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="toolbar"
-                disabled={sendMutation.isPending}
-                onClick={() => {
-                  setSendError(null);
-                  setNotice(null);
-                  setInviteUrl(null);
-                  sendMutation.mutate();
-                }}
-              >
-                {sendMutation.isPending ? "Working…" : resendLabel}
-              </Button>
+            <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
               {!editing ? (
-                <Button type="button" size="toolbar" onClick={startEdit}>
-                  Edit
-                </Button>
+                <div className="flex w-full gap-2 sm:contents">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="toolbar"
+                    disabled={sendMutation.isPending}
+                    className="min-h-11 min-w-0 flex-1 basis-0 sm:h-9 sm:flex-none sm:basis-auto"
+                    onClick={() => {
+                      setSendError(null);
+                      setNotice(null);
+                      setInviteUrl(null);
+                      sendMutation.mutate();
+                    }}
+                  >
+                    {sendMutation.isPending ? "Working…" : resendLabel}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="toolbar"
+                    className="min-h-11 min-w-0 flex-1 basis-0 sm:h-9 sm:flex-none sm:basis-auto"
+                    onClick={startEdit}
+                  >
+                    Edit
+                  </Button>
+                </div>
               ) : (
-                <>
+                <div className="flex w-full gap-2 sm:contents">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="toolbar"
+                    disabled={sendMutation.isPending}
+                    className="min-h-11 min-w-0 flex-[2] basis-0 sm:h-9 sm:flex-none sm:basis-auto"
+                    onClick={() => {
+                      setSendError(null);
+                      setNotice(null);
+                      setInviteUrl(null);
+                      sendMutation.mutate();
+                    }}
+                  >
+                    {sendMutation.isPending ? "Working…" : resendLabel}
+                  </Button>
                   <Button
                     type="button"
                     size="toolbar"
                     disabled={patchMutation.isPending}
+                    className="min-h-11 min-w-0 flex-1 basis-0 sm:h-9 sm:flex-none sm:basis-auto"
                     onClick={() => patchMutation.mutate()}
                   >
                     {patchMutation.isPending ? "Saving…" : "Save"}
@@ -651,11 +669,12 @@ export function DirectoryUserDetailClient({
                     variant="ghost"
                     size="toolbar"
                     disabled={patchMutation.isPending}
+                    className="min-h-11 min-w-0 flex-1 basis-0 sm:h-9 sm:flex-none sm:basis-auto"
                     onClick={cancelEdit}
                   >
                     Cancel
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </div>

@@ -1,16 +1,36 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import { Geist_Mono, Inter } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+/** Host Grotesk variable (OFL) — Latin + Latin Extended; see `app/fonts/OFL.txt`. */
+const hostGrotesk = localFont({
+  src: [
+    {
+      path: "./fonts/host-grotesk-latin-wght-normal.woff2",
+      weight: "300 800",
+      style: "normal",
+    },
+    {
+      path: "./fonts/host-grotesk-latin-ext-wght-normal.woff2",
+      weight: "300 800",
+      style: "normal",
+    },
+  ],
+  variable: "--font-host-grotesk",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -34,7 +54,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#fafafa" },
-    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+    { media: "(prefers-color-scheme: dark)", color: "#02090a" },
   ],
   colorScheme: "dark light",
 };
@@ -45,12 +65,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="flex min-h-full flex-col">
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${inter.variable} ${geistMono.variable} ${hostGrotesk.variable} flex min-h-full flex-col antialiased`}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>

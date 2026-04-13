@@ -1,4 +1,7 @@
+import { AdminChromeBrand } from "@/components/admin/admin-chrome-brand";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { AdminTopNavbar } from "@/components/admin/admin-top-navbar";
+import { ResponsiveAppSidebar } from "@/components/layout/responsive-app-sidebar";
 import { requireAdmin } from "@/lib/admin/require-admin";
 
 export default async function AdminLayout({
@@ -6,14 +9,36 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireAdmin();
+  const session = await requireAdmin();
 
   return (
-    <div className="flex min-h-full flex-col bg-zinc-50 dark:bg-zinc-950 md:flex-row">
-      <aside className="shrink-0 border-b border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900 md:min-h-screen md:w-60 md:border-b-0 md:border-r">
-        <AdminSidebar />
-      </aside>
-      <main className="min-h-0 min-w-0 flex-1 p-4 md:p-8">{children}</main>
+    <div className="flex h-dvh max-h-dvh flex-col overflow-hidden bg-muted/15">
+      {/* One border under brand + navbar (desktop only) */}
+      <div className="hidden w-full shrink-0 items-stretch border-b border-border bg-card md:flex">
+        <div className="flex w-60 shrink-0 items-stretch border-r border-border bg-card">
+          <AdminChromeBrand />
+        </div>
+        <div className="min-w-0 flex-1 bg-background">
+          <AdminTopNavbar showBottomBorder={false} />
+        </div>
+      </div>
+
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
+        <ResponsiveAppSidebar>
+          <AdminSidebar
+            email={session.email}
+            fullName={session.fullName}
+            avatarUrl={session.avatarUrl}
+          />
+        </ResponsiveAppSidebar>
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background">
+          <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain p-4 md:p-8">
+            <div className="mx-auto w-full min-h-0 max-w-6xl">
+              {children}
+            </div>
+          </main>
+        </div>
+      </div>
     </div>
   );
 }

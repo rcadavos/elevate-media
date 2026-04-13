@@ -1,40 +1,91 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 type AuthShellProps = {
   title: string;
   subtitle: string;
   children: ReactNode;
+  brandPlacement?: "inside-card" | "outside-card";
+  showBackToHome?: boolean;
+  edgeThemeToggle?: boolean;
+  centerHeaderText?: boolean;
+  compactSubtitleTopSpacing?: boolean;
 };
 
-export function AuthShell({ title, subtitle, children }: AuthShellProps) {
+export function AuthShell({
+  title,
+  subtitle,
+  children,
+  brandPlacement = "inside-card",
+  showBackToHome = true,
+  edgeThemeToggle = false,
+  centerHeaderText = false,
+  compactSubtitleTopSpacing = false,
+}: AuthShellProps) {
   return (
-    <div className="flex min-h-full flex-1 flex-col bg-zinc-50 px-4 py-10 dark:bg-zinc-950 sm:px-6 sm:py-16">
-      <div className="mx-auto w-full max-w-md">
-        <div className="mb-8 flex items-center justify-between gap-4">
-          <Link
-            href="/"
-            className="inline-flex text-sm font-medium text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-          >
-            ← Back to home
-          </Link>
+    <div className="flex min-h-full flex-1 flex-col bg-muted/30 px-4 py-4 sm:px-6 sm:py-8">
+      {edgeThemeToggle ? (
+        <div className="mb-8 flex w-full justify-end">
           <ThemeToggle />
         </div>
-        <div className="rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8">
-          <div className="mb-8">
-            <p className="text-xs font-semibold uppercase tracking-widest text-violet-600 dark:text-violet-400">
-              elev8temedia
-            </p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-              {title}
-            </h1>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-              {subtitle}
-            </p>
+      ) : null}
+      <div className="mx-auto w-full max-w-md">
+        {showBackToHome || !edgeThemeToggle ? (
+          <div className="mb-8 flex items-center justify-between gap-4">
+            {showBackToHome ? (
+              <Button
+                render={<Link href="/landing" />}
+                nativeButton={false}
+                variant="ghost"
+                className="h-auto px-0 text-muted-foreground hover:text-foreground"
+              >
+                ← Back to home
+              </Button>
+            ) : (
+              <span />
+            )}
+            {!edgeThemeToggle ? <ThemeToggle /> : null}
           </div>
-          {children}
-        </div>
+        ) : null}
+        {brandPlacement === "outside-card" ? (
+          <p className="mb-4 text-center text-2xl font-semibold tracking-wide text-primary sm:text-3xl">
+            elev8temedia
+          </p>
+        ) : null}
+        <Card className="rounded-xl shadow-sm ring-border">
+          <CardHeader
+            className={cn(
+              "border-b border-border pb-6",
+              centerHeaderText && "text-center",
+            )}
+          >
+            {brandPlacement === "inside-card" ? (
+              <p className="text-xs font-semibold tracking-widest text-primary">
+                elev8temedia
+              </p>
+            ) : null}
+            <CardTitle className="mt-2 text-2xl">{title}</CardTitle>
+            <CardDescription
+              className={cn(
+                compactSubtitleTopSpacing ? "mt-1" : "mt-2",
+                "text-base leading-relaxed",
+              )}
+            >
+              {subtitle}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-2 pb-2">{children}</CardContent>
+        </Card>
       </div>
     </div>
   );

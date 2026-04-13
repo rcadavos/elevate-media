@@ -6,73 +6,97 @@ import {
   DIRECTORY_ROLES,
   DIRECTORY_ROLE_LABELS,
 } from "@/lib/constants/directory-roles";
+import { Button } from "@/components/ui/button";
+import {
+  Sidebar,
+  SidebarAccountMenu,
+  SidebarBody,
+  SidebarFooter,
+  SidebarMenu,
+  SidebarNav,
+  SidebarSection,
+} from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
-function linkClass(active: boolean) {
-  return [
-    "rounded-lg px-3 py-2 text-sm font-medium transition",
-    active
-      ? "bg-violet-600 text-white shadow-sm"
-      : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
-  ].join(" ");
-}
+export type AdminSidebarProps = {
+  email: string | null;
+  fullName: string | null;
+  avatarUrl?: string | null;
+};
 
-export function AdminSidebar() {
+export function AdminSidebar({ email, fullName, avatarUrl }: AdminSidebarProps) {
   const pathname = usePathname();
+
   const dashboardActive =
-    pathname === "/admin" || pathname.startsWith("/admin?");
+    pathname === "/admin/dashboard" ||
+    pathname === "/admin" ||
+    pathname.startsWith("/admin?");
+
+  const auditLogsActive = pathname === "/admin/audit-logs";
+
+  const displayName =
+    fullName?.trim() || email?.trim() || "Account";
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
-          elev8temedia
-        </p>
-        <p className="mt-1 text-base font-semibold text-zinc-900 dark:text-zinc-50">
-          Admin
-        </p>
-      </div>
-
-      <nav className="flex flex-col gap-1" aria-label="Admin">
-        <Link href="/admin" className={linkClass(dashboardActive)}>
-          Dashboard
-        </Link>
-      </nav>
-
-      <div>
-        <p className="mb-2 px-1 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
-          Directory
-        </p>
-        <ul className="flex flex-col gap-0.5">
-          {DIRECTORY_ROLES.map((role) => {
-            const href = `/admin/directory/${role}`;
-            const active = pathname === href;
-            return (
-              <li key={role}>
-                <Link href={href} className={linkClass(active)}>
-                  {DIRECTORY_ROLE_LABELS[role]}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-
-      <div className="mt-auto border-t border-zinc-200 pt-4 dark:border-zinc-800">
-        <Link
-          href="/dashboard"
-          className="block rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-        >
-          Team workspace
-        </Link>
-        <form action="/auth/signout" method="post" className="mt-1">
-          <button
-            type="submit"
-            className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+    <Sidebar className="h-full min-h-0">
+      <SidebarBody>
+        <SidebarNav aria-label="Admin">
+          <Button
+            render={<Link href="/admin/dashboard" />}
+            nativeButton={false}
+            variant={dashboardActive ? "default" : "ghost"}
+            className={cn(
+              "h-10 min-h-10 justify-start px-2.5 text-sm",
+              !dashboardActive && "font-normal",
+            )}
           >
-            Sign out
-          </button>
-        </form>
-      </div>
-    </div>
+            Dashboard
+          </Button>
+          <Button
+            render={<Link href="/admin/audit-logs" />}
+            nativeButton={false}
+            variant={auditLogsActive ? "default" : "ghost"}
+            className={cn(
+              "h-10 min-h-10 justify-start px-2.5 text-sm",
+              !auditLogsActive && "font-normal",
+            )}
+          >
+            Audit logs
+          </Button>
+        </SidebarNav>
+
+        <SidebarSection title="Directory">
+          <SidebarMenu>
+            {DIRECTORY_ROLES.map((role) => {
+              const href = `/admin/directory/${role}`;
+              const active = pathname === href;
+              return (
+                <li key={role}>
+                  <Button
+                    render={<Link href={href} />}
+                    nativeButton={false}
+                    variant={active ? "default" : "ghost"}
+                    className={cn(
+                      "h-10 min-h-10 w-full justify-start px-2.5 text-sm",
+                      !active && "font-normal",
+                    )}
+                  >
+                    {DIRECTORY_ROLE_LABELS[role]}
+                  </Button>
+                </li>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarSection>
+      </SidebarBody>
+
+      <SidebarFooter>
+        <SidebarAccountMenu
+          email={email}
+          displayName={displayName}
+          avatarUrl={avatarUrl}
+        />
+      </SidebarFooter>
+    </Sidebar>
   );
 }

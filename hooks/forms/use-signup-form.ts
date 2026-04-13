@@ -4,7 +4,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { getPostSignInRedirectPath } from "@/lib/auth/post-sign-in-redirect";
 import { createClient } from "@/lib/supabase/client";
+import { mapAuthClientMutationError } from "@/lib/forms/map-auth-url-error";
 import { queryKeys } from "@/lib/query/query-keys";
 
 export type SignupFormValues = {
@@ -47,7 +49,9 @@ export function useSignupForm() {
         queryKey: queryKeys.me.sessionSummary(),
       });
       if (data?.session) {
-        router.push("/dashboard");
+        const supabase = createClient();
+        const path = await getPostSignInRedirectPath(supabase);
+        router.push(path);
         router.refresh();
         return;
       }
@@ -81,10 +85,7 @@ export function useSignupForm() {
       onError: (err) => {
         setError("root", {
           type: "server",
-          message:
-            err instanceof Error
-              ? err.message
-              : "Something went wrong. Try again.",
+          message: mapAuthClientMutationError(err),
         });
       },
     });

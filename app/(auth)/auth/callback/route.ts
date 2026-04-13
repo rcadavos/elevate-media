@@ -1,22 +1,22 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { getPostSignInRedirectPath } from "@/lib/auth/post-sign-in-redirect";
+import { readSupabasePublicEnv } from "@/lib/supabase/public-env";
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  const next = requestUrl.searchParams.get("next") ?? "/dashboard";
+  const nextParam = requestUrl.searchParams.get("next");
   const origin = requestUrl.origin;
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!code || !url || !key) {
+  const env = readSupabasePublicEnv();
+  if (!code || !env) {
     return NextResponse.redirect(`${origin}/login?error=missing_config`);
   }
 
   const cookieStore = await cookies();
-  const supabase = createServerClient(url, key, {
+  const supabase = createServerClient(env.url, env.key, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -31,7 +31,8 @@ export async function GET(request: Request) {
 
   const { error } = await supabase.auth.exchangeCodeForSession(code);
   if (!error) {
-    return NextResponse.redirect(`${origin}${next}`);
+    const path = await getPostSignInRedirectPath(supabase, nextParam);
+    return NextResponse.redirect(`${origin}${path}`);
   }
 
   return NextResponse.redirect(`${origin}/login?error=auth`);

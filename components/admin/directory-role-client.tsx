@@ -3,10 +3,11 @@
 import { useQuery } from "@tanstack/react-query";
 import type { DirectoryRole } from "@/lib/constants/directory-roles";
 import { DIRECTORY_ROLE_LABELS } from "@/lib/constants/directory-roles";
-import { DirectoryCreateForm } from "@/components/admin/directory-create-form";
+import { DirectoryCreateUserModal } from "@/components/admin/directory-create-user-modal";
 import { DirectoryTable } from "@/components/admin/directory-table";
 import { fetchAdminProfiles } from "@/lib/query/admin-profiles";
 import { queryKeys } from "@/lib/query/query-keys";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type DirectoryRoleClientProps = {
   role: DirectoryRole;
@@ -19,31 +20,48 @@ export function DirectoryRoleClient({ role }: DirectoryRoleClientProps) {
   });
 
   const rows = profilesQuery.data ?? [];
+  const isInitialLoading =
+    profilesQuery.isPending && profilesQuery.data === undefined;
+
+  let segmentSubheader: string;
+  if (role === "client") {
+    let completed = 0;
+    let pending = 0;
+    for (const r of rows) {
+      if (r.onboarding_status === "pending") pending += 1;
+      else completed += 1;
+    }
+    segmentSubheader = `${completed} Completed, ${pending} Pending`;
+  } else {
+    segmentSubheader = `${rows.length} user${rows.length === 1 ? "" : "s"} in this segment.`;
+  }
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-        {DIRECTORY_ROLE_LABELS[role]} accounts
-      </h2>
-      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-        {profilesQuery.isPending
-          ? "Loading…"
-          : `${rows.length} user${rows.length === 1 ? "" : "s"} in this segment.`}
-      </p>
+      <div>
+        <h2 className="text-lg font-semibold text-foreground">
+          {DIRECTORY_ROLE_LABELS[role]} accounts
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {isInitialLoading ? "Loading…" : segmentSubheader}
+        </p>
+      </div>
 
       {profilesQuery.isError ? (
-        <p
-          className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200"
-          role="alert"
-        >
-          Could not load this directory segment. Refresh or try again.
-        </p>
+        <Alert variant="destructive" className="mt-4">
+          <AlertTitle>Directory unavailable</AlertTitle>
+          <AlertDescription>
+            Could not load this directory segment. Refresh or try again.
+          </AlertDescription>
+        </Alert>
       ) : null}
 
-      <div className="mt-8 space-y-8">
-        <DirectoryCreateForm role={role} />
-        <DirectoryTable rows={rows} />
-      </div>
+      <DirectoryTable
+        role={role}
+        rows={rows}
+        isInitialLoading={isInitialLoading}
+        toolbarEnd={<DirectoryCreateUserModal role={role} />}
+      />
     </div>
   );
 }

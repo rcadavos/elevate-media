@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { logAuditEvent } from "@/lib/audit/log-audit-event";
 import { assertCallerIsAdmin } from "@/lib/api/admin-auth";
 import { createServiceRoleClient } from "@/lib/supabase/admin-server";
+import { createClient } from "@/lib/supabase/server";
 import {
   isDirectoryRole,
   type DirectoryRole,
@@ -72,6 +74,7 @@ export async function POST(request: Request) {
       email: data.user.email,
       full_name: fullName,
       role: role as DirectoryRole,
+      is_active: true,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "id" },
@@ -83,6 +86,19 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
+
+  const supabase = await createClient();
+  await logAuditEvent(supabase, {
+    action: "directory.user_create",
+    entityId: data.user.id,
+    targetEmail: data.user.email,
+    summary: `Admin created ${role} user ${data.user.email ?? data.user.id}`,
+    changes: {
+      email: data.user.email,
+      role,
+      full_name: fullName,
+    },
+  });
 
   return NextResponse.json({
     id: data.user.id,

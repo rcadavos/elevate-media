@@ -3,45 +3,48 @@ import {
   DIRECTORY_ROLE_LABELS,
   type DirectoryRole,
 } from "@/lib/constants/directory-roles";
+import { Button } from "@/components/ui/button";
 
 type NonAdminWorkspaceRole = Exclude<DirectoryRole, "admin">;
 
 export function RoleWorkspacePlaceholder({
   role,
+  title,
 }: {
   role: NonAdminWorkspaceRole;
+  /** Overrides the default “{Label} workspace” heading. */
+  title?: string;
 }) {
   const label = DIRECTORY_ROLE_LABELS[role];
+  const heading = title?.trim() || `${label} workspace`;
 
   return (
-    <div className="mx-auto flex min-h-full max-w-2xl flex-col px-4 py-12 sm:px-6">
-      <p className="text-xs font-semibold uppercase tracking-widest text-violet-600 dark:text-violet-400">
+    <div className="mx-auto flex min-h-full max-w-2xl flex-col bg-background px-4 py-12 sm:px-6">
+      <p className="text-xs font-semibold uppercase tracking-widest text-primary">
         elev8temedia
       </p>
-      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-        {label} workspace
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+        {heading}
       </h1>
-      <p className="mt-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+      <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
         This URL is reserved for {label.toLowerCase()}-specific modules. Add
         nested routes beside this page inside the matching{" "}
-        <code className="rounded bg-zinc-100 px-1 text-xs dark:bg-zinc-800">
+        <code className="rounded bg-muted px-1 text-xs text-foreground">
           ({role})
         </code>{" "}
         route group in the app directory.
       </p>
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-        <Link
-          href="/dashboard"
-          className="inline-flex items-center justify-center rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-violet-500"
-        >
+        <Button render={<Link href="/dashboard" />} nativeButton={false}>
           Workspace home
-        </Link>
-        <Link
-          href="/"
-          className="inline-flex items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+        </Button>
+        <Button
+          render={<Link href="/" />}
+          nativeButton={false}
+          variant="outline"
         >
           Marketing home
-        </Link>
+        </Button>
       </div>
     </div>
   );

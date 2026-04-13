@@ -5,6 +5,7 @@ export type AdminSession = {
   userId: string;
   email: string | null;
   fullName: string | null;
+  avatarUrl: string | null;
 };
 
 export async function requireAdmin(): Promise<AdminSession> {
@@ -25,7 +26,7 @@ export async function requireAdmin(): Promise<AdminSession> {
 
   const { data: profile, error } = await supabase
     .from("profiles")
-    .select("role, full_name, email")
+    .select("role, full_name, email, avatar_url")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -46,5 +47,9 @@ export async function requireAdmin(): Promise<AdminSession> {
     userId: user.id,
     email: profile.email ?? user.email ?? null,
     fullName: profile.full_name,
+    avatarUrl:
+      typeof profile.avatar_url === "string" && profile.avatar_url.trim()
+        ? profile.avatar_url.trim()
+        : null,
   };
 }

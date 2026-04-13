@@ -38,7 +38,7 @@ The app **must support installation as a PWA** (manifest, service worker via **`
 
 - Keep **`app/manifest.ts`** accurate: `name`, `short_name`, `start_url`, `display`, `theme_color`, `background_color`, and **icons** under `public/icons/` (include a **maskable** 512×512 asset for home-screen masks).
 - Prefer **`standalone`** or **`minimal-ui`** display for an app-like shell.
-- When adding routes or auth flows, ensure **middleware does not intercept** the service worker, workbox bundles, or **`/manifest.webmanifest`** (see `middleware.ts` matcher).
+- When adding routes or auth flows, ensure **the root proxy** does not intercept the service worker, workbox bundles, or **`/manifest.webmanifest`** (see `proxy.ts` matcher).
 - **`next.config.ts`** sets **`turbopack: {}`** so Next.js 16 does not error when a merged **webpack** config exists (from this plugin) and something runs **`next dev`** / **`next build`** without a bundler flag.
 - For **this repo’s scripts**, use **`next dev --webpack`** and **`next build --webpack`**: that matches the PWA plugin and ensures **`npm run build`** emits the service worker. A plain **`next build`** (Turbopack) may compile without the earlier guard error but **skips** the PWA webpack step — use **`npm run build`** for real releases. Prefer migrating to [Serwist](https://serwist.pages.dev) if you want Turbopack-first workflows later.
 - Generated **`public/sw.js`** and **`public/workbox-*.js`** are gitignored; they are recreated on each production build.
@@ -46,18 +46,21 @@ The app **must support installation as a PWA** (manifest, service worker via **`
 
 ---
 
-## UI components (`/components/ui/`)
+## UI — shadcn/ui (`/components/ui/`)
 
-**Always prefer reusable primitives** over one-off markup for interactive and visual building blocks.
+The app uses **[shadcn/ui](https://ui.shadcn.com)** on **Tailwind CSS v4** (see **`components.json`**: style **base-nova**, `cssVariables`, **lucide** icons). Primitives are **copied into the repo** under **`components/ui/`** (not a black-box npm UI kit), backed by **Base UI** primitives where the registry supplies them (e.g. **`Button`**, **`Input`**).
 
-- **Location:** shared, design-system-style components live under **`components/ui/`** (e.g. `button.tsx`, `input.tsx`, `label.tsx`, `textarea.tsx`, `select.tsx`, `checkbox.tsx`, `tabs.tsx`, `badge.tsx`, `card.tsx`, `dialog.tsx`, `dropdown-menu.tsx`, `table.tsx`, `form` helpers).
-- **Customization:** each primitive should expose **clear props** (`variant`, `size`, `tone`, `className`, etc.), use **typed variants** (e.g. `class-variance-authority` + `tailwind-merge` via a small `cn()` helper), and support **composition** (`asChild` where appropriate) so screens stay thin.
-- **Forms:** use **`react-hook-form`** and **colocated hooks** under **`hooks/forms/`** (e.g. `useLoginForm`, `useSignupForm`, `useDirectoryUserCreateForm`) so pages stay thin — **do not** scatter `useState` per field on route components. Prefer **`useMutation`** from TanStack Query inside those hooks for submit side-effects, cache invalidation, and loading state. Compose fields from **`components/ui/`** primitives when they exist; wire labels with `htmlFor` / `id`; surface validation and errors with `role="alert"` / `aria-invalid` / `aria-describedby`. Shared field styling helpers may live in **`lib/forms/`** until migrated to ui inputs.
-- **Do not** duplicate raw `<button className="...">` / `<input className="...">` patterns across feature folders when a ui primitive exists or should exist — **extend the ui layer** instead.
+- **Visual reference:** Before adding or materially changing **UI** (marketing pages, auth chrome, dashboards, spacing/type/color choices beyond existing tokens), read **`DESIGN.md`** for atmosphere, palette roles, and interaction patterns. Treat it as the project’s living spec and **edit `DESIGN.md`** when the team intentionally changes direction so future work stays aligned.
+- **Registry CLI:** add or refresh components with **`npx shadcn@latest add <name> -y`** (e.g. `button`, `input`, `card`, `dialog`). This updates **`components/ui/*`** and may add peer deps; commit the generated files.
+- **Imports:** use **`@/components/ui`** (see **`components/ui/index.ts`**) or import a specific file from **`@/components/ui/...`**. Use **`cn()`** from **`lib/utils.ts`** (`clsx` + `tailwind-merge`) when merging classes.
+- **Theming:** design tokens live in **`app/globals.css`** (`@import "shadcn/tailwind.css"` plus **`@theme inline`** CSS variables such as `--primary`, `--background`, `--radius`, …). The **`shadcn`** npm package is required for that stylesheet import — **do not remove** it unless you replace the import with an equivalent theme bundle.
+- **Light and dark mode — verification (required before merging UI work):** Theme switching uses **`next-themes`** with **`attribute="class"`** and light/dark only (see **`components/providers.tsx`**). **Always manually toggle** light and dark in the browser on every surface you touch (marketing, auth, dashboard, admin, role placeholders) and fix contrast or invisible text. Prefer **semantic tokens** (`bg-background`, `bg-card`, `bg-muted`, `text-foreground`, `text-muted-foreground`, `border-border`) over raw **`bg-white` / `text-zinc-900`** without a matching **`dark:`** pair — hardcoded neutrals are a common source of “broken” dark mode. Ensure **`ThemeToggle`** is reachable wherever the chrome implies account or settings access (e.g. admin sidebar footer).
+- **Forms:** use **`react-hook-form`** and hooks under **`hooks/forms/`**; compose fields from **`Input`**, **`Label`**, **`Button`**, and **`Alert`** (and other shadcn components as you add them). Use **`aria-invalid`** on inputs when validation fails; pair **`Label`** `htmlFor` with control **`id`**. Prefer **`Alert`** / **`AlertTitle`** / **`AlertDescription`** for blocking errors; use neutral **`role="status"`** blocks for success copy so it is not announced as an error.
+- **Links styled as buttons:** Base UI **`Button`** supports a **`render`** prop (e.g. **`render={<Link href="…" />}`** with **`nativeButton={false}`**) so Next.js **`Link`** keeps client navigation and button styling.
+- **Admin toolbar / directory actions:** Use **`Button`** with **`size="toolbar"`** (`h-10`, `rounded-md`, comfortable padding) for primary row actions (e.g. Send onboarding, Save, Cancel, Edit, **Add User**). That height is the default for admin toolbars in this repo—prefer **`toolbar`** over **`size="sm"`** (`h-7`) for those clusters unless space is extremely tight.
+- **Do not** hand-roll raw `<button>` / `<input>` patterns in feature folders when a **`components/ui`** primitive exists — **extend shadcn** or add a missing primitive via the CLI, then compose.
 
-Feature-specific wrappers (e.g. `components/admin/...`) may compose **`components/ui/*`** but should not redefine base styles for the same control.
-
-A starter **`Button`** with typed **`variant`** / **`size`** props lives in **`components/ui/button.tsx`** (re-exported from **`components/ui/index.ts`**); grow this folder with inputs, tabs, badges, and other primitives as the product expands.
+Feature folders (**`components/admin/…`**, **`components/auth/…`**, marketing, dashboard) should compose **`components/ui/*`** for controls, cards, tables, and alerts.
 
 ---
 
@@ -104,7 +107,7 @@ Parentheses name a **route group**: they organize files and layouts **without** 
 | **Marketing** | `(marketing)/` | `/` |
 | **Auth** | `(auth)/` | `/login`, `/signup`, `/auth/callback`, `/auth/signout` |
 | **Dashboard** | `(dashboard)/` | `/dashboard` |
-| **Admin** | `(admin)/admin/` | `/admin`, `/admin/directory`, `/admin/directory/[role]` |
+| **Admin** | `(admin)/admin/` | `/admin` (redirect), `/admin/dashboard`, `/admin/directory`, `/admin/directory/[role]` |
 | **Client** | `(client)/client/` | `/client` (placeholder hub; add nested routes as modules ship) |
 | **Sales** | `(sales)/sales/` | `/sales` |
 | **Finance** | `(finance)/finance/` | `/finance` |
@@ -130,14 +133,22 @@ Use [**TanStack Query**](https://tanstack.com/query) (`@tanstack/react-query`) f
 - **Writes:** use **`useMutation`**; on success **`invalidateQueries`** for every affected key (e.g. after creating a directory user, invalidate `queryKeys.admin.profiles(role)`; after auth, invalidate `queryKeys.me.sessionSummary()`).
 - **Route handlers** under **`app/api/**`** remain the source of truth for auth and RLS; keep them thin and typed responses JSON-only where possible.
 
+### Admin directory — tables and create user (**TanStack Table** + **Dialog**)
+
+- **User lists** in **Admin → Directory** (per-role segments) use [**TanStack Table**](https://tanstack.com/table) (`@tanstack/react-table`) with **`getCoreRowModel`**, composed with **`components/ui/table`** primitives for markup (see **`components/admin/directory-table.tsx`**).
+- **Create directory user** is a **modal dialog** (`components/ui/dialog.tsx` + `components/admin/directory-create-user-modal.tsx`), not an inline card on the page. Reuse **`DirectoryCreateForm`** with **`variant="plain"`** inside the dialog body; keep **`react-hook-form`** + **`useDirectoryUserCreateForm`** for the mutation and query invalidation.
+
 ---
 
 ## Agent workflow expectations
 
-- **Read this file** when starting unfamiliar work on this repo.
+- **Read this file** when starting unfamiliar work on this repo; for **UI or layout** work, also read **`DESIGN.md`** first (see **Visual reference** under UI above).
+- **Re-read before you edit:** Immediately before changing **any** file (including **`AGENTS.md`** or **`DESIGN.md`**), **read the latest contents from disk again** in this session. The user may apply small edits while you work; refreshing the file avoids overwriting those changes. If you read this doc for context earlier and are about to patch it—or many messages have passed—**open it again** first.
 - **Match existing patterns** in the codebase once files exist (naming, folder layout, component style).
 - **Scope:** Demo-first unless the user asks for auth/DB/export; then implement incrementally with verification.
 - **Do not** add large unrelated refactors or extra markdown docs unless requested.
+- **Git:** do **not** create commits, amend history, or push unless the user explicitly asks. Leave changes in the working tree so the user reviews and commits with their own messages and timing.
+- **Verification (every substantive change):** run **`npm run lint`** and **`npm run build`** before considering the task done or reporting success; fix any failures and re-run until both exit cleanly. Use the repo’s **`npm run build`** (includes **`--webpack`**) so the production build matches the PWA guidance above.
 
 ---
 

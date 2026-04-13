@@ -10,11 +10,10 @@ function createAppQueryClient() {
       queries: {
         staleTime: 30_000,
         gcTime: 5 * 60_000,
-        refetchOnWindowFocus: true,
-        retry: 1,
+        retry: 3,
       },
       mutations: {
-        retry: 0,
+        retry: 3,
       },
     },
   });
@@ -23,14 +22,22 @@ function createAppQueryClient() {
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(createAppQueryClient);
 
+  // React 19: next-themes injects an inline <script> for no-flash theme; the client
+  // warns unless the script is non-executable (see pacocoursey/next-themes#387).
+  const themeScriptProps =
+    typeof window === "undefined"
+      ? undefined
+      : ({ type: "application/json" } as const);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider
         attribute="class"
-        defaultTheme="light"
+        defaultTheme="dark"
         enableSystem={false}
         themes={["light", "dark"]}
         disableTransitionOnChange
+        scriptProps={themeScriptProps}
       >
         {children}
       </ThemeProvider>

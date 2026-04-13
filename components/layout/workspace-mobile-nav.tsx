@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
-import { House, LayoutDashboard, LogOut, Menu, PanelLeft, X } from "lucide-react";
+import { House, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -40,13 +40,12 @@ export function WorkspaceMobileNav() {
           <Dialog.Trigger
             type="button"
             className={cn(
-              buttonVariants({ variant: "outline", size: "sm" }),
-              "h-10 shrink-0 gap-1 px-3",
+              buttonVariants({ variant: "outline", size: "icon" }),
+              "h-10 w-10 shrink-0",
             )}
             aria-label="Open workspace menu"
           >
-            <PanelLeft className="size-3.5 shrink-0 opacity-70" aria-hidden />
-            <Menu className="size-3.5 shrink-0" aria-hidden />
+            <Menu className="size-4 shrink-0" aria-hidden />
           </Dialog.Trigger>
         </div>
       </div>

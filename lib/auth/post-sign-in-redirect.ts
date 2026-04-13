@@ -12,7 +12,7 @@ export const DEFAULT_SIGNED_IN_PATH = "/dashboard" as const;
 
 const ROLE_PORTAL_PATHS: Record<DirectoryRole, string> = {
   admin: ADMIN_HOME_PATH,
-  client: "/client",
+  client: "/client/hub",
   sales: "/sales",
   finance: "/finance",
   operations: "/operations",

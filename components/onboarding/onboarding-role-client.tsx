@@ -44,7 +44,12 @@ function OnboardingInviteGate({
 }) {
   const [state, setState] = useState<
     | { status: "loading" }
-    | { status: "ready"; emailHint: string }
+    | {
+        status: "ready";
+        emailHint: string;
+        defaultFullName?: string;
+        businessName?: string;
+      }
     | { status: "error"; message: string }
   >({ status: "loading" });
 
@@ -58,6 +63,8 @@ function OnboardingInviteGate({
       const data = (await res.json().catch(() => ({}))) as {
         error?: string;
         emailHint?: string;
+        defaultFullName?: string;
+        businessName?: string;
       };
       if (cancelled) return;
       if (!res.ok) {
@@ -70,6 +77,8 @@ function OnboardingInviteGate({
       setState({
         status: "ready",
         emailHint: data.emailHint ?? "your work email",
+        defaultFullName: data.defaultFullName,
+        businessName: data.businessName,
       });
     })();
     return () => {
@@ -99,6 +108,8 @@ function OnboardingInviteGate({
       role={role}
       inviteToken={inviteToken}
       emailHint={state.emailHint}
+      defaultFullName={state.defaultFullName}
+      businessName={state.businessName}
     />
   );
 }

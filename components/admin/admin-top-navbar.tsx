@@ -1,9 +1,8 @@
 "use client";
 
-import { Search } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { AdminNavSearch } from "@/components/admin/admin-nav-search";
 
 type AdminTopNavbarProps = {
   className?: string;
@@ -24,20 +23,7 @@ export function AdminTopNavbar({
       )}
     >
       <div className="min-w-0 flex-1" aria-hidden />
-      <div className="relative mx-auto w-full min-w-0 max-w-md shrink-0">
-        <Search
-          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-          aria-hidden
-        />
-        <Input
-          type="search"
-          name="q"
-          placeholder="Search clients, directory, pages…"
-          className="w-full pl-10"
-          aria-label="Search workspace"
-          autoComplete="off"
-        />
-      </div>
+      <AdminNavSearch className="relative mx-auto w-full min-w-0 max-w-md shrink-0" />
       <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
         <ThemeToggle />
       </div>

@@ -1,5 +1,5 @@
+import { ClientWorkspaceChrome } from "@/components/layout/client-workspace-chrome";
 import { WorkspaceContentShell } from "@/components/layout/workspace-content-shell";
-import { WorkspaceMobileNav } from "@/components/layout/workspace-mobile-nav";
 
 export default function ClientGroupLayout({
   children,
@@ -8,7 +8,7 @@ export default function ClientGroupLayout({
 }) {
   return (
     <div className="flex min-h-dvh flex-col bg-background">
-      <WorkspaceMobileNav />
+      <ClientWorkspaceChrome />
       <WorkspaceContentShell>{children}</WorkspaceContentShell>
     </div>
   );

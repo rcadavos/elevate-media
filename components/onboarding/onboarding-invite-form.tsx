@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { DIRECTORY_ROLE_LABELS } from "@/lib/constants/directory-roles";
 import type { DirectoryRole } from "@/lib/constants/directory-roles";
@@ -18,6 +18,8 @@ type OnboardingInviteFormProps = {
   role: DirectoryRole;
   inviteToken: string;
   emailHint: string;
+  defaultFullName?: string;
+  businessName?: string;
 };
 
 type FormValues = {
@@ -30,6 +32,8 @@ export function OnboardingInviteForm({
   role,
   inviteToken,
   emailHint,
+  defaultFullName,
+  businessName,
 }: OnboardingInviteFormProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -43,8 +47,15 @@ export function OnboardingInviteForm({
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = form;
+
+  useEffect(() => {
+    if (defaultFullName?.trim()) {
+      setValue("full_name", defaultFullName.trim());
+    }
+  }, [defaultFullName, setValue]);
 
   const onSubmit = handleSubmit(async (values) => {
     setServerError(null);
@@ -113,6 +124,15 @@ export function OnboardingInviteForm({
           <span className="font-medium text-foreground">{emailHint}</span>
         </p>
       </div>
+
+      {businessName?.trim() ? (
+        <div className="rounded-lg border border-border bg-muted/40 px-3 py-2">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Business
+          </p>
+          <p className="mt-1 text-sm font-medium text-foreground">{businessName}</p>
+        </div>
+      ) : null}
 
       {serverError ? (
         <Alert variant="destructive">

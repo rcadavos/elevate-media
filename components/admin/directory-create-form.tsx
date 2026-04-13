@@ -19,12 +19,45 @@ type DirectoryCreateFormProps = {
   role: DirectoryRole;
   /** `plain` omits the card chrome (e.g. inside a dialog). */
   variant?: "card" | "plain";
+  /** Right-aligned, larger submit — use inside the directory create dialog. */
+  modalFooter?: boolean;
   onCreated?: () => void;
 };
+
+/** Stable id for `aria-describedby` on the directory create dialog title. */
+export function directoryCreateIntroDomId(role: DirectoryRole): string {
+  return `directory-add-intro-${role}`;
+}
+
+function DirectoryCreateIntroText({ role }: { role: DirectoryRole }) {
+  if (role === "client") {
+    return (
+      <>
+        Saves an onboarding invite for a{" "}
+        <span className="font-medium text-foreground">
+          {DIRECTORY_ROLE_LABELS[role]}
+        </span>
+        . Their login is created when they finish the invite link — no
+        temporary password. Requires the service role key.
+      </>
+    );
+  }
+  return (
+    <>
+      Creates an account with the{" "}
+      <span className="font-medium text-foreground">
+        {DIRECTORY_ROLE_LABELS[role]}
+      </span>{" "}
+      role. The server needs the Supabase service role key configured for this
+      action.
+    </>
+  );
+}
 
 export function DirectoryCreateForm({
   role,
   variant = "card",
+  modalFooter = false,
   onCreated,
 }: DirectoryCreateFormProps) {
   const {
@@ -32,6 +65,8 @@ export function DirectoryCreateForm({
     registerFullName,
     registerEmail,
     registerPassword,
+    registerBusinessName,
+    registerDateJoined,
     onValidSubmit,
     success,
     isSubmitting,
@@ -40,12 +75,22 @@ export function DirectoryCreateForm({
     formState: { errors },
   } = form;
 
+  const introId = directoryCreateIntroDomId(role);
+
   const formBody = (
     <form
       onSubmit={onValidSubmit}
       className="grid gap-4 sm:grid-cols-2"
       noValidate
     >
+      {variant === "plain" ? (
+        <p
+          id={introId}
+          className="sm:col-span-2 text-pretty text-sm leading-relaxed text-muted-foreground"
+        >
+          <DirectoryCreateIntroText role={role} />
+        </p>
+      ) : null}
       {errors.root?.message && !success ? (
         <Alert variant="destructive" className="sm:col-span-2">
           <AlertTitle>Error</AlertTitle>
@@ -60,28 +105,96 @@ export function DirectoryCreateForm({
           {success}
         </div>
       ) : null}
+      {role === "client" ? (
+        <>
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor={`business_name_${role}`}>Business name</Label>
+            <Input
+              id={`business_name_${role}`}
+              autoComplete="organization"
+              aria-invalid={errors.business_name ? "true" : "false"}
+              aria-describedby={
+                errors.business_name ? `business_name_${role}-error` : undefined
+              }
+              {...registerBusinessName}
+            />
+            {errors.business_name?.message ? (
+              <p
+                id={`business_name_${role}-error`}
+                className="text-sm text-destructive"
+                role="alert"
+              >
+                {errors.business_name.message}
+              </p>
+            ) : null}
+          </div>
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor={`full_name_${role}`}>Client name</Label>
+            <Input
+              id={`full_name_${role}`}
+              autoComplete="name"
+              aria-invalid={errors.full_name ? "true" : "false"}
+              aria-describedby={
+                errors.full_name ? `full_name_${role}-error` : undefined
+              }
+              {...registerFullName}
+            />
+            {errors.full_name?.message ? (
+              <p
+                id={`full_name_${role}-error`}
+                className="text-sm text-destructive"
+                role="alert"
+              >
+                {errors.full_name.message}
+              </p>
+            ) : null}
+          </div>
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor={`date_joined_${role}`}>Date joined</Label>
+            <Input
+              id={`date_joined_${role}`}
+              type="date"
+              aria-invalid={errors.date_joined ? "true" : "false"}
+              aria-describedby={
+                errors.date_joined ? `date_joined_${role}-error` : undefined
+              }
+              {...registerDateJoined}
+            />
+            {errors.date_joined?.message ? (
+              <p
+                id={`date_joined_${role}-error`}
+                className="text-sm text-destructive"
+                role="alert"
+              >
+                {errors.date_joined.message}
+              </p>
+            ) : null}
+          </div>
+        </>
+      ) : (
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor={`full_name_${role}`}>Full name</Label>
+          <Input
+            id={`full_name_${role}`}
+            autoComplete="name"
+            aria-invalid={errors.full_name ? "true" : "false"}
+            aria-describedby={
+              errors.full_name ? `full_name_${role}-error` : undefined
+            }
+            {...registerFullName}
+          />
+          {errors.full_name?.message ? (
+            <p
+              id={`full_name_${role}-error`}
+              className="text-sm text-destructive"
+              role="alert"
+            >
+              {errors.full_name.message}
+            </p>
+          ) : null}
+        </div>
+      )}
       <div className="space-y-2 sm:col-span-2">
-        <Label htmlFor={`full_name_${role}`}>Full name</Label>
-        <Input
-          id={`full_name_${role}`}
-          autoComplete="name"
-          aria-invalid={errors.full_name ? "true" : "false"}
-          aria-describedby={
-            errors.full_name ? `full_name_${role}-error` : undefined
-          }
-          {...registerFullName}
-        />
-        {errors.full_name?.message ? (
-          <p
-            id={`full_name_${role}-error`}
-            className="text-sm text-destructive"
-            role="alert"
-          >
-            {errors.full_name.message}
-          </p>
-        ) : null}
-      </div>
-      <div className="space-y-2">
         <Label htmlFor={`email_${role}`}>Email</Label>
         <Input
           id={`email_${role}`}
@@ -101,31 +214,53 @@ export function DirectoryCreateForm({
           </p>
         ) : null}
       </div>
-      <div className="space-y-2">
-        <Label htmlFor={`password_${role}`}>Temporary password</Label>
-        <Input
-          id={`password_${role}`}
-          type="password"
-          autoComplete="new-password"
-          aria-invalid={errors.password ? "true" : "false"}
-          aria-describedby={
-            errors.password ? `password_${role}-error` : undefined
+      {role !== "client" ? (
+        <div className="space-y-2 sm:col-span-2">
+          <Label htmlFor={`password_${role}`}>Temporary password</Label>
+          <Input
+            id={`password_${role}`}
+            type="password"
+            autoComplete="new-password"
+            aria-invalid={errors.password ? "true" : "false"}
+            aria-describedby={
+              errors.password ? `password_${role}-error` : undefined
+            }
+            {...registerPassword}
+          />
+          {errors.password?.message ? (
+            <p
+              id={`password_${role}-error`}
+              className="text-sm text-destructive"
+              role="alert"
+            >
+              {errors.password.message}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+      <div
+        className={
+          modalFooter ?
+            "flex justify-end sm:col-span-2"
+          : "sm:col-span-2"
+        }
+      >
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className={
+            modalFooter ?
+              "h-11 min-w-[10.5rem] rounded-md px-8 text-base font-medium"
+            : undefined
           }
-          {...registerPassword}
-        />
-        {errors.password?.message ? (
-          <p
-            id={`password_${role}-error`}
-            className="text-sm text-destructive"
-            role="alert"
-          >
-            {errors.password.message}
-          </p>
-        ) : null}
-      </div>
-      <div className="sm:col-span-2">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating…" : "Create user"}
+        >
+          {isSubmitting ?
+            role === "client" ?
+              "Saving…"
+            : "Creating…"
+          : role === "client" ?
+            "Create Client"
+          : "Create User"}
         </Button>
       </div>
     </form>
@@ -140,12 +275,7 @@ export function DirectoryCreateForm({
       <CardHeader>
         <CardTitle>Add {DIRECTORY_ROLE_LABELS[role]}</CardTitle>
         <CardDescription>
-          Creates an account with the{" "}
-          <span className="font-medium text-foreground">
-            {DIRECTORY_ROLE_LABELS[role]}
-          </span>{" "}
-          role. The server needs the Supabase service role key configured for
-          this action.
+          <DirectoryCreateIntroText role={role} />
         </CardDescription>
       </CardHeader>
       <CardContent>{formBody}</CardContent>

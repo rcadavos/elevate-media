@@ -25,12 +25,15 @@ export default async function AdminLayout({
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
         <ResponsiveAppSidebar>
-          <AdminSidebar email={session.email} fullName={session.fullName} />
+          <AdminSidebar
+            email={session.email}
+            fullName={session.fullName}
+            avatarUrl={session.avatarUrl}
+          />
         </ResponsiveAppSidebar>
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background">
-          <AdminTopNavbar className="shrink-0 md:hidden" />
-          <main className="min-h-0 flex-1 overflow-y-auto p-4 md:p-8">
-            <div className="mx-auto w-full min-h-full max-w-6xl md:min-h-[calc(100dvh-8.5rem)]">
+          <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain p-4 md:p-8">
+            <div className="mx-auto w-full min-h-0 max-w-6xl">
               {children}
             </div>
           </main>

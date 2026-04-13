@@ -5,6 +5,7 @@ export const queryKeys = {
   me: {
     all: ["me"] as const,
     sessionSummary: () => ["me", "session-summary"] as const,
+    profile: () => ["me", "profile"] as const,
   },
   admin: {
     all: ["admin"] as const,

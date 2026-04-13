@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 import { logAuditEvent } from "@/lib/audit/log-audit-event";
 import { assertCallerIsAdmin } from "@/lib/api/admin-auth";
-import { isDirectoryRole, type DirectoryRole } from "@/lib/constants/directory-roles";
+import {
+  DIRECTORY_ROLE_LABELS,
+  isDirectoryRole,
+  type DirectoryRole,
+} from "@/lib/constants/directory-roles";
+import { sendOnboardingInviteEmail } from "@/lib/email/send-onboarding-invite-email";
 import { generateInviteToken, hashInviteToken } from "@/lib/onboarding/invite-token";
+import { resolveInviteAppOrigin } from "@/lib/onboarding/invite-app-origin";
 import { createServiceRoleClient } from "@/lib/supabase/admin-server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -52,7 +58,7 @@ export async function POST(
 
   const { data: profile, error: profileErr } = await admin
     .from("profiles")
-    .select("id, email, role")
+    .select("id, email, full_name, role, business_name")
     .eq("id", userId)
     .maybeSingle();
 
@@ -90,24 +96,55 @@ export async function POST(
     .update({ onboarding_sent_at: sentAt, updated_at: sentAt })
     .eq("id", userId);
 
-  const origin = new URL(request.url).origin;
+  const origin = resolveInviteAppOrigin(request);
   const invitePath = `/onboarding/${role}?invite=${encodeURIComponent(token)}`;
   const inviteUrl = `${origin}${invitePath}`;
+
+  const toEmail = typeof profile.email === "string" ? profile.email.trim() : "";
+  let emailSent = false;
+  let emailError: string | undefined;
+  let missingResendConfig = false;
+  if (toEmail) {
+    const emailResult = await sendOnboardingInviteEmail({
+      to: toEmail,
+      inviteUrl,
+      greetingName: profile.full_name,
+      businessName:
+        typeof profile.business_name === "string" ? profile.business_name : null,
+      roleLabel: DIRECTORY_ROLE_LABELS[role],
+    });
+    emailSent = emailResult.ok;
+    if (!emailResult.ok) {
+      emailError = emailResult.message;
+      missingResendConfig = emailResult.reason === "missing_api_key";
+    }
+  } else {
+    emailError = "Profile has no email address";
+  }
 
   const payload: {
     ok: true;
     sentAt: string;
-    inviteUrl?: string;
+    inviteUrl: string;
+    emailSent: boolean;
+    emailError?: string;
     message: string;
   } = {
     ok: true,
     sentAt,
-    message:
-      "Onboarding invite created. Deliver the link to the user by your org email or SMS.",
+    inviteUrl,
+    emailSent,
+    message: emailSent
+      ? "Onboarding invite created and emailed to the user."
+      : missingResendConfig
+        ? "Onboarding invite created. Set RESEND_API_KEY (and INVITE_EMAIL_FROM) to email automatically — copy the invite link below."
+        : toEmail
+          ? `Onboarding invite created. Email could not be sent (${emailError ?? "unknown error"}) — copy the invite link below.`
+          : "Onboarding invite created. Add an email to this profile to send automatically — copy the invite link below.",
   };
 
-  if (process.env.NODE_ENV === "development") {
-    payload.inviteUrl = inviteUrl;
+  if (!emailSent && emailError) {
+    payload.emailError = emailError;
   }
 
   const supabase = await createClient();
@@ -119,6 +156,8 @@ export async function POST(
     changes: {
       invite_expires_at: expiresAt,
       role,
+      email_sent: emailSent,
+      ...(emailError ? { email_error: emailError } : {}),
     },
   });
 

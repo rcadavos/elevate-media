@@ -22,7 +22,9 @@ export default async function AdminDirectoryUserPage({
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("profiles")
-    .select("id,email,full_name,role,created_at,onboarding_sent_at,is_active")
+    .select(
+      "id,email,full_name,business_name,business_logo_url,avatar_url,role,created_at,date_joined,onboarding_sent_at,is_active",
+    )
     .eq("id", userId)
     .eq("role", role)
     .maybeSingle();

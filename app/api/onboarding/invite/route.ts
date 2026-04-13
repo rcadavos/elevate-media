@@ -25,7 +25,9 @@ export async function GET(request: Request) {
   const tokenHash = hashInviteToken(token);
   const { data: invite, error } = await admin
     .from("onboarding_invites")
-    .select("user_id, role, expires_at, consumed_at")
+    .select(
+      "user_id, role, expires_at, consumed_at, email, pending_full_name, business_name",
+    )
     .eq("token_hash", tokenHash)
     .maybeSingle();
 
@@ -45,16 +47,41 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "This invite has expired" }, { status: 410 });
   }
 
-  const { data: userRow, error: userErr } = await admin.auth.admin.getUserById(
-    invite.user_id,
-  );
+  if (invite.user_id) {
+    const { data: userRow, error: userErr } = await admin.auth.admin.getUserById(
+      invite.user_id,
+    );
 
-  if (userErr || !userRow?.user?.email) {
-    return NextResponse.json({ error: "User record unavailable" }, { status: 500 });
+    if (userErr || !userRow?.user?.email) {
+      return NextResponse.json({ error: "User record unavailable" }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      ok: true as const,
+      emailHint: emailInviteHint(userRow.user.email),
+    });
   }
+
+  const pendingEmail =
+    typeof invite.email === "string" && invite.email.trim() ? invite.email.trim() : "";
+
+  if (!pendingEmail) {
+    return NextResponse.json({ error: "Invite is missing email" }, { status: 500 });
+  }
+
+  const defaultFullName =
+    typeof invite.pending_full_name === "string" && invite.pending_full_name.trim()
+      ? invite.pending_full_name.trim()
+      : undefined;
+  const businessName =
+    typeof invite.business_name === "string" && invite.business_name.trim()
+      ? invite.business_name.trim()
+      : undefined;
 
   return NextResponse.json({
     ok: true as const,
-    emailHint: emailInviteHint(userRow.user.email),
+    emailHint: emailInviteHint(pendingEmail),
+    defaultFullName,
+    businessName,
   });
 }

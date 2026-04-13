@@ -4,11 +4,13 @@ import * as React from "react";
 import { Plus } from "lucide-react";
 import type { DirectoryRole } from "@/lib/constants/directory-roles";
 import { DIRECTORY_ROLE_LABELS } from "@/lib/constants/directory-roles";
-import { DirectoryCreateForm } from "@/components/admin/directory-create-form";
+import {
+  DirectoryCreateForm,
+  directoryCreateIntroDomId,
+} from "@/components/admin/directory-create-form";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -28,28 +30,23 @@ export function DirectoryCreateUserModal({ role }: DirectoryCreateUserModalProps
       <DialogTrigger
         type="button"
         className={cn(
-          buttonVariants({ variant: "default" }),
-          "inline-flex h-10 shrink-0 items-center gap-2 rounded-md px-3",
+          buttonVariants({ variant: "default", size: "toolbar" }),
+          "inline-flex w-full min-w-0 items-center justify-center sm:w-auto",
         )}
       >
         <Plus className="size-4 shrink-0" aria-hidden />
-        Add User
+        Add {DIRECTORY_ROLE_LABELS[role]}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add {DIRECTORY_ROLE_LABELS[role]}</DialogTitle>
-          <DialogDescription>
-            Creates an account with the{" "}
-            <span className="font-medium text-foreground">
-              {DIRECTORY_ROLE_LABELS[role]}
-            </span>{" "}
-            role. The server needs the Supabase service role key configured for
-            this action.
-          </DialogDescription>
+          <DialogTitle aria-describedby={directoryCreateIntroDomId(role)}>
+            Add {DIRECTORY_ROLE_LABELS[role]}
+          </DialogTitle>
         </DialogHeader>
         <DirectoryCreateForm
           role={role}
           variant="plain"
+          modalFooter
           onCreated={() => setOpen(false)}
         />
       </DialogContent>

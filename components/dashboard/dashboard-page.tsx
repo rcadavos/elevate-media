@@ -142,8 +142,9 @@ export function DashboardPage() {
       <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
         Signed in as{" "}
         <span className="font-medium text-foreground">{data.email}</span>. The
-        full dashboard modules will land here next — this screen confirms your
-        session is active.
+        full dashboard modules live under{" "}
+        <span className="font-medium text-foreground">Admin dashboard</span> for
+        admin accounts; this screen confirms your session is active.
       </p>
 
       <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">

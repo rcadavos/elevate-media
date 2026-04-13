@@ -21,9 +21,10 @@ import { cn } from "@/lib/utils";
 export type AdminSidebarProps = {
   email: string | null;
   fullName: string | null;
+  avatarUrl?: string | null;
 };
 
-export function AdminSidebar({ email, fullName }: AdminSidebarProps) {
+export function AdminSidebar({ email, fullName, avatarUrl }: AdminSidebarProps) {
   const pathname = usePathname();
 
   const dashboardActive =
@@ -44,7 +45,10 @@ export function AdminSidebar({ email, fullName }: AdminSidebarProps) {
             render={<Link href="/admin/dashboard" />}
             nativeButton={false}
             variant={dashboardActive ? "default" : "ghost"}
-            className={cn("justify-start", !dashboardActive && "font-normal")}
+            className={cn(
+              "h-10 min-h-10 justify-start px-2.5 text-sm",
+              !dashboardActive && "font-normal",
+            )}
           >
             Dashboard
           </Button>
@@ -52,7 +56,10 @@ export function AdminSidebar({ email, fullName }: AdminSidebarProps) {
             render={<Link href="/admin/audit-logs" />}
             nativeButton={false}
             variant={auditLogsActive ? "default" : "ghost"}
-            className={cn("justify-start", !auditLogsActive && "font-normal")}
+            className={cn(
+              "h-10 min-h-10 justify-start px-2.5 text-sm",
+              !auditLogsActive && "font-normal",
+            )}
           >
             Audit logs
           </Button>
@@ -70,7 +77,7 @@ export function AdminSidebar({ email, fullName }: AdminSidebarProps) {
                     nativeButton={false}
                     variant={active ? "default" : "ghost"}
                     className={cn(
-                      "w-full justify-start",
+                      "h-10 min-h-10 w-full justify-start px-2.5 text-sm",
                       !active && "font-normal",
                     )}
                   >
@@ -84,7 +91,11 @@ export function AdminSidebar({ email, fullName }: AdminSidebarProps) {
       </SidebarBody>
 
       <SidebarFooter>
-        <SidebarAccountMenu email={email} displayName={displayName} />
+        <SidebarAccountMenu
+          email={email}
+          displayName={displayName}
+          avatarUrl={avatarUrl}
+        />
       </SidebarFooter>
     </Sidebar>
   );

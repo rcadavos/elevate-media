@@ -46,7 +46,9 @@ export async function POST(request: Request) {
   const tokenHash = hashInviteToken(token);
   const { data: invite, error: invErr } = await admin
     .from("onboarding_invites")
-    .select("id, user_id, role, expires_at, consumed_at")
+    .select(
+      "id, user_id, role, expires_at, consumed_at, email, business_name, date_joined",
+    )
     .eq("token_hash", tokenHash)
     .maybeSingle();
 
@@ -66,42 +68,127 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "This invite has expired" }, { status: 410 });
   }
 
-  const userId = invite.user_id as string;
+  const consumedAt = new Date().toISOString();
 
-  const { error: authErr } = await admin.auth.admin.updateUserById(userId, {
+  if (invite.user_id) {
+    const userId = invite.user_id as string;
+
+    const { error: authErr } = await admin.auth.admin.updateUserById(userId, {
+      password,
+      user_metadata: {
+        full_name: fullName,
+        role,
+      },
+      email_confirm: true,
+    });
+
+    if (authErr) {
+      return NextResponse.json({ error: authErr.message }, { status: 400 });
+    }
+
+    const { error: profErr } = await admin
+      .from("profiles")
+      .update({
+        full_name: fullName,
+        role,
+        updated_at: consumedAt,
+      })
+      .eq("id", userId);
+
+    if (profErr) {
+      return NextResponse.json({ error: profErr.message }, { status: 500 });
+    }
+
+    await admin
+      .from("onboarding_invites")
+      .update({ consumed_at: consumedAt })
+      .eq("id", invite.id);
+
+    const { data: userRow } = await admin.auth.admin.getUserById(userId);
+    const email = userRow?.user?.email ?? null;
+
+    return NextResponse.json({
+      ok: true as const,
+      email,
+    });
+  }
+
+  if (role !== "client") {
+    return NextResponse.json(
+      { error: "This invite type is only completed for client accounts." },
+      { status: 400 },
+    );
+  }
+
+  if (!fullName) {
+    return NextResponse.json({ error: "Full name is required" }, { status: 400 });
+  }
+
+  const inviteEmail =
+    typeof invite.email === "string" && invite.email.trim()
+      ? invite.email.trim().toLowerCase()
+      : "";
+
+  if (!inviteEmail) {
+    return NextResponse.json({ error: "Invite is missing email" }, { status: 500 });
+  }
+
+  const businessNameRaw = invite.business_name;
+  const businessName =
+    typeof businessNameRaw === "string" && businessNameRaw.trim()
+      ? businessNameRaw.trim()
+      : "";
+
+  const { data: created, error: createErr } = await admin.auth.admin.createUser({
+    email: inviteEmail,
     password,
+    email_confirm: true,
     user_metadata: {
       full_name: fullName,
-      role,
+      role: "client",
+      ...(businessName ? { business_name: businessName } : {}),
     },
-    email_confirm: true,
   });
 
-  if (authErr) {
-    return NextResponse.json({ error: authErr.message }, { status: 400 });
+  if (createErr || !created.user?.id) {
+    return NextResponse.json(
+      { error: createErr?.message ?? "Could not create account" },
+      { status: 400 },
+    );
   }
+
+  const newUserId = created.user.id;
+
+  const inviteDateJoinedRaw = invite.date_joined;
+  const inviteDateJoined =
+    typeof inviteDateJoinedRaw === "string" && inviteDateJoinedRaw.trim()
+      ? inviteDateJoinedRaw.trim()
+      : null;
 
   const { error: profErr } = await admin
     .from("profiles")
     .update({
       full_name: fullName,
-      role,
-      updated_at: new Date().toISOString(),
+      role: "client",
+      business_name: businessName || null,
+      date_joined: inviteDateJoined ?? consumedAt,
+      updated_at: consumedAt,
     })
-    .eq("id", userId);
+    .eq("id", newUserId);
 
   if (profErr) {
     return NextResponse.json({ error: profErr.message }, { status: 500 });
   }
 
-  const consumedAt = new Date().toISOString();
   await admin
     .from("onboarding_invites")
-    .update({ consumed_at: consumedAt })
+    .update({
+      consumed_at: consumedAt,
+      user_id: newUserId,
+    })
     .eq("id", invite.id);
 
-  const { data: userRow } = await admin.auth.admin.getUserById(userId);
-  const email = userRow?.user?.email ?? null;
+  const email = created.user.email ?? inviteEmail;
 
   return NextResponse.json({
     ok: true as const,

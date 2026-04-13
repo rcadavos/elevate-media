@@ -24,8 +24,13 @@ export async function fetchAdminProfiles(
 function normalizeProfileRow(
   row: ProfileRow | (Omit<ProfileRow, "is_active"> & { is_active?: boolean }),
 ): ProfileRow {
+  const hasUserId = typeof row.user_id === "string" && row.user_id.length > 0;
+  const isInviteRow = row.id.startsWith("invite:");
   return {
     ...row,
+    user_id: hasUserId ? row.user_id : isInviteRow ? null : row.id,
+    onboarding_status:
+      row.onboarding_status === "pending" ? "pending" : "completed",
     is_active: row.is_active !== false,
   };
 }
@@ -35,7 +40,12 @@ export async function patchAdminProfile(
   payload: {
     role: DirectoryRole;
     full_name?: string;
+    business_name?: string | null;
+    business_logo_url?: string | null;
+    avatar_url?: string | null;
     is_active?: boolean;
+    /** `YYYY-MM-DD` or ISO string; client profiles only (API enforces). */
+    date_joined?: string;
   },
 ): Promise<ProfileRow> {
   const res = await fetch(`/api/admin/profiles/${encodeURIComponent(userId)}`, {
@@ -47,6 +57,32 @@ export async function patchAdminProfile(
   const data = (await res.json()) as { error?: string; profile?: ProfileRow };
   if (!res.ok) {
     throw new Error(data.error ?? "Update failed");
+  }
+  if (!data.profile) {
+    throw new Error("Missing profile in response");
+  }
+  return normalizeProfileRow(data.profile);
+}
+
+export async function uploadAdminClientProfilePhoto(
+  userId: string,
+  kind: "business_logo" | "avatar",
+  file: File,
+): Promise<ProfileRow> {
+  const fd = new FormData();
+  fd.set("kind", kind);
+  fd.set("file", file);
+  const res = await fetch(
+    `/api/admin/profiles/${encodeURIComponent(userId)}/photo`,
+    {
+      method: "POST",
+      body: fd,
+      credentials: "same-origin",
+    },
+  );
+  const data = (await res.json()) as { error?: string; profile?: ProfileRow };
+  if (!res.ok) {
+    throw new Error(data.error ?? "Upload failed");
   }
   if (!data.profile) {
     throw new Error("Missing profile in response");

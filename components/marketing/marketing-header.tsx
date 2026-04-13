@@ -46,7 +46,7 @@ export function MarketingHeader() {
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <header className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 dark:bg-[#061a1c]/90 dark:supports-[backdrop-filter]:bg-[#061a1c]/75">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
-          <Link href="/" className="group flex min-w-0 items-baseline gap-2">
+          <Link href="/landing" className="group flex min-w-0 items-baseline gap-2">
             <span className="text-sm font-semibold tracking-tight text-foreground transition group-hover:text-primary">
               elev8temedia
             </span>

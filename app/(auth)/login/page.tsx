@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { AuthShell } from "@/components/auth/auth-shell";
@@ -28,14 +27,13 @@ function LoginForm() {
     <AuthShell
       title="Sign in"
       subtitle="Sign in to your elev8temedia workspace."
+      brandPlacement="outside-card"
+      showBackToHome={false}
+      edgeThemeToggle
+      centerHeaderText
+      compactSubtitleTopSpacing
     >
       <form onSubmit={onValidSubmit} className="space-y-5" noValidate>
-        {errors.root?.message ? (
-          <Alert variant="destructive">
-            <AlertTitle>Sign in failed</AlertTitle>
-            <AlertDescription>{errors.root.message}</AlertDescription>
-          </Alert>
-        ) : null}
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -78,25 +76,20 @@ function LoginForm() {
             </p>
           ) : null}
         </div>
+        {errors.root?.message ? (
+          <Alert variant="destructive">
+            <AlertTitle>Sign in failed</AlertTitle>
+            <AlertDescription>{errors.root.message}</AlertDescription>
+          </Alert>
+        ) : null}
         <Button
           type="submit"
-          className="w-full"
+          className="w-full rounded-md h-10 mt-6"
           size="lg"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Signing in…" : "Sign in"}
         </Button>
-        <p className="text-center text-sm text-muted-foreground">
-          No account yet?{" "}
-          <Button
-            render={<Link href="/signup" />}
-            nativeButton={false}
-            variant="link"
-            className="h-auto p-0 text-primary"
-          >
-            Create one
-          </Button>
-        </p>
       </form>
     </AuthShell>
   );
@@ -109,6 +102,11 @@ export default function LoginPage() {
         <AuthShell
           title="Sign in"
           subtitle="Sign in to your elev8temedia workspace."
+          brandPlacement="outside-card"
+          showBackToHome={false}
+          edgeThemeToggle
+          centerHeaderText
+          compactSubtitleTopSpacing
         >
           <p className="text-sm text-muted-foreground">Loading…</p>
         </AuthShell>

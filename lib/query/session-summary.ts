@@ -24,3 +24,17 @@ export async function fetchSessionSummary(
   }
   return (await res.json()) as SessionSummary;
 }
+
+/** Same as {@link fetchSessionSummary} but returns `null` when there is no session (401). */
+export async function fetchSessionSummaryIfAuthenticated(): Promise<SessionSummary | null> {
+  const res = await fetch("/api/me/session-summary", {
+    credentials: "same-origin",
+  });
+  if (res.status === 401) {
+    return null;
+  }
+  if (!res.ok) {
+    return null;
+  }
+  return (await res.json()) as SessionSummary;
+}

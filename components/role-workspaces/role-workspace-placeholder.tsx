@@ -15,7 +15,7 @@ export function RoleWorkspacePlaceholder({
   const label = DIRECTORY_ROLE_LABELS[role];
 
   return (
-    <div className="mx-auto flex min-h-full max-w-2xl flex-col px-4 py-12 sm:px-6">
+    <div className="mx-auto flex min-h-full max-w-2xl flex-col bg-background px-4 py-12 sm:px-6">
       <p className="text-xs font-semibold uppercase tracking-widest text-primary">
         elev8temedia
       </p>

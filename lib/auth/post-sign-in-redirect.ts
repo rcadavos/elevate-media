@@ -20,6 +20,7 @@ export function isSafeAuthRedirectPath(path: string): boolean {
     "/sales",
     "/finance",
     "/operations",
+    "/onboarding",
   ] as const;
   return prefixes.some(
     (p) => path === p || path.startsWith(`${p}/`),

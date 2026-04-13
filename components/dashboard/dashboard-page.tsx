@@ -90,7 +90,7 @@ export function DashboardPage() {
 
       {notice === "admin_only" ? (
         <p
-          className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-50"
+          className="mt-4 rounded-lg border border-primary/25 bg-primary/5 px-3 py-2 text-sm text-foreground"
           role="status"
         >
           That area is limited to admin accounts. Ask an admin to grant you
@@ -113,7 +113,7 @@ export function DashboardPage() {
 
       {errorParam === "no_profile" || noProfile ? (
         <p
-          className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-50"
+          className="mt-4 rounded-lg border border-primary/25 bg-primary/5 px-3 py-2 text-sm text-foreground"
           role="status"
         >
           No profile row was found for your account. After running the database

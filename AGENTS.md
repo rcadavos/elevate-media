@@ -38,7 +38,7 @@ The app **must support installation as a PWA** (manifest, service worker via **`
 
 - Keep **`app/manifest.ts`** accurate: `name`, `short_name`, `start_url`, `display`, `theme_color`, `background_color`, and **icons** under `public/icons/` (include a **maskable** 512×512 asset for home-screen masks).
 - Prefer **`standalone`** or **`minimal-ui`** display for an app-like shell.
-- When adding routes or auth flows, ensure **middleware does not intercept** the service worker, workbox bundles, or **`/manifest.webmanifest`** (see `middleware.ts` matcher).
+- When adding routes or auth flows, ensure **the root proxy** does not intercept the service worker, workbox bundles, or **`/manifest.webmanifest`** (see `proxy.ts` matcher).
 - **`next.config.ts`** sets **`turbopack: {}`** so Next.js 16 does not error when a merged **webpack** config exists (from this plugin) and something runs **`next dev`** / **`next build`** without a bundler flag.
 - For **this repo’s scripts**, use **`next dev --webpack`** and **`next build --webpack`**: that matches the PWA plugin and ensures **`npm run build`** emits the service worker. A plain **`next build`** (Turbopack) may compile without the earlier guard error but **skips** the PWA webpack step — use **`npm run build`** for real releases. Prefer migrating to [Serwist](https://serwist.pages.dev) if you want Turbopack-first workflows later.
 - Generated **`public/sw.js`** and **`public/workbox-*.js`** are gitignored; they are recreated on each production build.
@@ -50,6 +50,7 @@ The app **must support installation as a PWA** (manifest, service worker via **`
 
 The app uses **[shadcn/ui](https://ui.shadcn.com)** on **Tailwind CSS v4** (see **`components.json`**: style **base-nova**, `cssVariables`, **lucide** icons). Primitives are **copied into the repo** under **`components/ui/`** (not a black-box npm UI kit), backed by **Base UI** primitives where the registry supplies them (e.g. **`Button`**, **`Input`**).
 
+- **Visual reference:** Before adding or materially changing **UI** (marketing pages, auth chrome, dashboards, spacing/type/color choices beyond existing tokens), read **`DESIGN.md`** for atmosphere, palette roles, and interaction patterns. Treat it as the project’s living spec and **edit `DESIGN.md`** when the team intentionally changes direction so future work stays aligned.
 - **Registry CLI:** add or refresh components with **`npx shadcn@latest add <name> -y`** (e.g. `button`, `input`, `card`, `dialog`). This updates **`components/ui/*`** and may add peer deps; commit the generated files.
 - **Imports:** use **`@/components/ui`** (see **`components/ui/index.ts`**) or import a specific file from **`@/components/ui/...`**. Use **`cn()`** from **`lib/utils.ts`** (`clsx` + `tailwind-merge`) when merging classes.
 - **Theming:** design tokens live in **`app/globals.css`** (`@import "shadcn/tailwind.css"` plus **`@theme inline`** CSS variables such as `--primary`, `--background`, `--radius`, …). The **`shadcn`** npm package is required for that stylesheet import — **do not remove** it unless you replace the import with an equivalent theme bundle.
@@ -131,11 +132,16 @@ Use [**TanStack Query**](https://tanstack.com/query) (`@tanstack/react-query`) f
 - **Writes:** use **`useMutation`**; on success **`invalidateQueries`** for every affected key (e.g. after creating a directory user, invalidate `queryKeys.admin.profiles(role)`; after auth, invalidate `queryKeys.me.sessionSummary()`).
 - **Route handlers** under **`app/api/**`** remain the source of truth for auth and RLS; keep them thin and typed responses JSON-only where possible.
 
+### Admin directory — tables and create user (**TanStack Table** + **Dialog**)
+
+- **User lists** in **Admin → Directory** (per-role segments) use [**TanStack Table**](https://tanstack.com/table) (`@tanstack/react-table`) with **`getCoreRowModel`**, composed with **`components/ui/table`** primitives for markup (see **`components/admin/directory-table.tsx`**).
+- **Create directory user** is a **modal dialog** (`components/ui/dialog.tsx` + `components/admin/directory-create-user-modal.tsx`), not an inline card on the page. Reuse **`DirectoryCreateForm`** with **`variant="plain"`** inside the dialog body; keep **`react-hook-form`** + **`useDirectoryUserCreateForm`** for the mutation and query invalidation.
+
 ---
 
 ## Agent workflow expectations
 
-- **Read this file** when starting unfamiliar work on this repo.
+- **Read this file** when starting unfamiliar work on this repo; for **UI or layout** work, also read **`DESIGN.md`** first (see **Visual reference** under UI above).
 - **Match existing patterns** in the codebase once files exist (naming, folder layout, component style).
 - **Scope:** Demo-first unless the user asks for auth/DB/export; then implement incrementally with verification.
 - **Do not** add large unrelated refactors or extra markdown docs unless requested.

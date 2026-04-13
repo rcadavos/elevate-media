@@ -9,5 +9,7 @@ export const queryKeys = {
   admin: {
     all: ["admin"] as const,
     profiles: (role: DirectoryRole) => ["admin", "profiles", role] as const,
+    auditLogs: (page: number, pageSize: number) =>
+      ["admin", "audit-logs", page, pageSize] as const,
   },
 } as const;

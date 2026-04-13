@@ -29,6 +29,18 @@ export {
   TableCaption,
 } from "@/components/ui/table";
 export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+export {
   DropdownMenu,
   DropdownMenuPortal,
   DropdownMenuTrigger,
@@ -45,3 +57,14 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
+export {
+  Sidebar,
+  SidebarBody,
+  SidebarBrand,
+  SidebarNav,
+  SidebarSection,
+  SidebarMenu,
+  SidebarFooter,
+  SidebarAccountMenu,
+} from "@/components/ui/sidebar";
+export type { SidebarAccountMenuProps } from "@/components/ui/sidebar";

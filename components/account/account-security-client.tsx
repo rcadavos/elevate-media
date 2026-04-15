@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { postMePassword } from "@/lib/query/me-profile";
@@ -115,7 +116,9 @@ export function AccountSecurityClient() {
               nativeButton={false}
               variant="ghost"
               disabled={mutation.isPending}
+              className="inline-flex items-center gap-1.5"
             >
+              <ChevronLeft className="size-4 shrink-0" aria-hidden />
               Back to profile
             </Button>
           </div>

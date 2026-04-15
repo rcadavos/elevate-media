@@ -49,6 +49,16 @@ export function useSignupForm() {
         queryKey: queryKeys.me.sessionSummary(),
       });
       if (data?.session) {
+        try {
+          await fetch("/api/me/sign-in-event", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ auth_factor: "password" }),
+          });
+        } catch {
+          /* non-blocking */
+        }
         const supabase = createClient();
         const path = await getPostSignInRedirectPath(supabase);
         router.push(path);

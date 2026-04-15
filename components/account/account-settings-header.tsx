@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -18,9 +19,10 @@ export function AccountSettingsHeader({ homeHref, homeLabel }: AccountSettingsHe
           nativeButton={false}
           variant="ghost"
           size="sm"
-          className="min-w-0 shrink px-0 text-muted-foreground"
+          className="inline-flex min-w-0 shrink items-center gap-1.5 px-0 text-muted-foreground"
         >
-          <span className="truncate">← {homeLabel}</span>
+          <ChevronLeft className="size-4 shrink-0" aria-hidden />
+          <span className="truncate">{homeLabel}</span>
         </Button>
         <ThemeToggle compact />
       </div>

@@ -12,5 +12,7 @@ export const queryKeys = {
     profiles: (role: DirectoryRole) => ["admin", "profiles", role] as const,
     auditLogs: (page: number, pageSize: number) =>
       ["admin", "audit-logs", page, pageSize] as const,
+    userLastLogin: (page: number, pageSize: number) =>
+      ["admin", "user-last-login", page, pageSize] as const,
   },
 } as const;

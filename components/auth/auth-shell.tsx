@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ChevronLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,9 +48,10 @@ export function AuthShell({
                 render={<Link href="/landing" />}
                 nativeButton={false}
                 variant="ghost"
-                className="h-auto px-0 text-muted-foreground hover:text-foreground"
+                className="inline-flex h-auto items-center gap-1.5 px-0 text-muted-foreground hover:text-foreground"
               >
-                ← Back to home
+                <ChevronLeft className="size-4 shrink-0" aria-hidden />
+                Back to home
               </Button>
             ) : (
               <span />

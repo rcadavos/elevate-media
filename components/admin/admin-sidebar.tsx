@@ -69,7 +69,8 @@ export function AdminSidebar({ email, fullName, avatarUrl }: AdminSidebarProps) 
           <SidebarMenu>
             {DIRECTORY_ROLES.map((role) => {
               const href = `/admin/directory/${role}`;
-              const active = pathname === href;
+              const active =
+                pathname === href || pathname.startsWith(`${href}/`);
               return (
                 <li key={role}>
                   <Button

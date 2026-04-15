@@ -34,7 +34,7 @@ export function SidebarBody({
     <div
       data-slot="sidebar-body"
       className={cn(
-        "min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain",
+        "min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]",
         className,
       )}
       {...props}
@@ -234,10 +234,12 @@ export function SidebarAccountMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="min-w-64"
-        side="bottom"
+        side="top"
         align="start"
         sideOffset={6}
         collisionPadding={8}
+        collisionAvoidance={{ side: "none" }}
+        renderGuards={false}
       >
         <div className="flex items-center gap-2.5 px-2 py-2.5">
           <SidebarAccountAvatar

@@ -24,8 +24,11 @@ function DropdownMenuContent({
   side = "bottom",
   sideOffset = 4,
   collisionPadding,
+  collisionAvoidance,
   /** Prefer `fixed` when triggers sit inside `overflow: auto` regions (admin sidebar). */
   positionMethod = "fixed",
+  /** When `false`, omits in-tree portal focus guards (helps narrow sidebars avoid layout nudge). */
+  renderGuards,
   className,
   ...props
 }: MenuPrimitive.Popup.Props &
@@ -36,10 +39,12 @@ function DropdownMenuContent({
     | "side"
     | "sideOffset"
     | "collisionPadding"
+    | "collisionAvoidance"
     | "positionMethod"
-  >) {
+  > &
+  Partial<Pick<MenuPrimitive.Portal.Props, "renderGuards">>) {
   return (
-    <MenuPrimitive.Portal>
+    <MenuPrimitive.Portal renderGuards={renderGuards}>
       <MenuPrimitive.Positioner
         className="isolate z-50 outline-none"
         align={align}
@@ -47,6 +52,7 @@ function DropdownMenuContent({
         side={side}
         sideOffset={sideOffset}
         collisionPadding={collisionPadding}
+        collisionAvoidance={collisionAvoidance}
         positionMethod={positionMethod}
       >
         <MenuPrimitive.Popup

@@ -18,20 +18,7 @@ function DropdownMenuTrigger({ ...props }: MenuPrimitive.Trigger.Props) {
   return <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />
 }
 
-function DropdownMenuContent({
-  align = "start",
-  alignOffset = 0,
-  side = "bottom",
-  sideOffset = 4,
-  collisionPadding,
-  collisionAvoidance,
-  /** Prefer `fixed` when triggers sit inside `overflow: auto` regions (admin sidebar). */
-  positionMethod = "fixed",
-  /** When `false`, omits in-tree portal focus guards (helps narrow sidebars avoid layout nudge). */
-  renderGuards,
-  className,
-  ...props
-}: MenuPrimitive.Popup.Props &
+type DropdownMenuContentProps = MenuPrimitive.Popup.Props &
   Pick<
     MenuPrimitive.Positioner.Props,
     | "align"
@@ -41,10 +28,22 @@ function DropdownMenuContent({
     | "collisionPadding"
     | "collisionAvoidance"
     | "positionMethod"
-  > &
-  Partial<Pick<MenuPrimitive.Portal.Props, "renderGuards">>) {
+  >
+
+function DropdownMenuContent({
+  align = "start",
+  alignOffset = 0,
+  side = "bottom",
+  sideOffset = 4,
+  collisionPadding,
+  collisionAvoidance,
+  /** Prefer `fixed` when triggers sit inside `overflow: auto` regions (admin sidebar). */
+  positionMethod = "fixed",
+  className,
+  ...props
+}: DropdownMenuContentProps) {
   return (
-    <MenuPrimitive.Portal renderGuards={renderGuards}>
+    <MenuPrimitive.Portal>
       <MenuPrimitive.Positioner
         className="isolate z-50 outline-none"
         align={align}

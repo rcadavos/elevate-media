@@ -233,13 +233,12 @@ export function SidebarAccountMenu({
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="min-w-64"
+        className="min-w-52 w-56 max-w-56"
         side="top"
         align="start"
         sideOffset={6}
         collisionPadding={8}
         collisionAvoidance={{ side: "none" }}
-        renderGuards={false}
       >
         <div className="flex items-center gap-2.5 px-2 py-2.5">
           <SidebarAccountAvatar

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query/query-keys";
@@ -56,8 +57,9 @@ export function DashboardPage() {
           render={<Link href="/login?error=missing_config" />}
           nativeButton={false}
           variant="link"
-          className="mt-4 h-auto px-0"
+          className="mt-4 inline-flex h-auto items-center gap-1.5 px-0"
         >
+          <ChevronLeft className="size-4 shrink-0" aria-hidden />
           Back to sign in
         </Button>
       </div>
@@ -157,7 +159,9 @@ export function DashboardPage() {
           render={<Link href="/" />}
           nativeButton={false}
           variant="outline"
+          className="inline-flex items-center gap-1.5"
         >
+          <ChevronLeft className="size-4 shrink-0" aria-hidden />
           Back to marketing home
         </Button>
         <form action="/auth/signout" method="post">

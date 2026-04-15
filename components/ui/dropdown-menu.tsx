@@ -18,17 +18,7 @@ function DropdownMenuTrigger({ ...props }: MenuPrimitive.Trigger.Props) {
   return <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />
 }
 
-function DropdownMenuContent({
-  align = "start",
-  alignOffset = 0,
-  side = "bottom",
-  sideOffset = 4,
-  collisionPadding,
-  /** Prefer `fixed` when triggers sit inside `overflow: auto` regions (admin sidebar). */
-  positionMethod = "fixed",
-  className,
-  ...props
-}: MenuPrimitive.Popup.Props &
+type DropdownMenuContentProps = MenuPrimitive.Popup.Props &
   Pick<
     MenuPrimitive.Positioner.Props,
     | "align"
@@ -36,8 +26,22 @@ function DropdownMenuContent({
     | "side"
     | "sideOffset"
     | "collisionPadding"
+    | "collisionAvoidance"
     | "positionMethod"
-  >) {
+  >
+
+function DropdownMenuContent({
+  align = "start",
+  alignOffset = 0,
+  side = "bottom",
+  sideOffset = 4,
+  collisionPadding,
+  collisionAvoidance,
+  /** Prefer `fixed` when triggers sit inside `overflow: auto` regions (admin sidebar). */
+  positionMethod = "fixed",
+  className,
+  ...props
+}: DropdownMenuContentProps) {
   return (
     <MenuPrimitive.Portal>
       <MenuPrimitive.Positioner
@@ -47,6 +51,7 @@ function DropdownMenuContent({
         side={side}
         sideOffset={sideOffset}
         collisionPadding={collisionPadding}
+        collisionAvoidance={collisionAvoidance}
         positionMethod={positionMethod}
       >
         <MenuPrimitive.Popup

@@ -56,6 +56,16 @@ export function useLoginForm({ urlError }: UseLoginFormOptions) {
     },
     onSuccess: async () => {
       const supabase = createClient();
+      try {
+        await fetch("/api/me/sign-in-event", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ auth_factor: "password" }),
+        });
+      } catch {
+        /* non-blocking */
+      }
       const path = await getPostSignInRedirectPath(supabase);
       await queryClient.invalidateQueries({
         queryKey: queryKeys.me.sessionSummary(),
@@ -76,6 +86,15 @@ export function useLoginForm({ urlError }: UseLoginFormOptions) {
     clearErrors("root");
     signInMutation.mutate(values, {
       onError: (err) => {
+        void fetch("/api/auth/sign-in-event", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: values.email,
+            auth_factor: "password",
+          }),
+        });
         setError("root", {
           type: "server",
           message: mapAuthClientMutationError(err),

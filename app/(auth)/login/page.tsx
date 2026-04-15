@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { AuthShell } from "@/components/auth/auth-shell";
@@ -90,6 +91,16 @@ function LoginForm() {
         >
           {isSubmitting ? "Signing in…" : "Sign in"}
         </Button>
+        <div className="text-center">
+          <Button
+            render={<Link href="/forgot-password" />}
+            nativeButton={false}
+            variant="link"
+            className="h-auto px-0 py-0 text-sm text-muted-foreground hover:text-foreground"
+          >
+            Forgot password?
+          </Button>
+        </div>
       </form>
     </AuthShell>
   );

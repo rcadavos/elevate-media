@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -119,9 +120,10 @@ export function DirectoryPendingInviteClient({
           nativeButton={false}
           variant="ghost"
           size="sm"
-          className="w-fit px-0 text-muted-foreground"
+          className="inline-flex w-fit items-center gap-1.5 px-0 text-muted-foreground"
         >
-          ← Back to {DIRECTORY_ROLE_LABELS.client} directory
+          <ChevronLeft className="size-4 shrink-0" aria-hidden />
+          Back to {DIRECTORY_ROLE_LABELS.client} directory
         </Button>
       </div>
 

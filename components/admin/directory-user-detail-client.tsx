@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 import type { DirectoryRole } from "@/lib/constants/directory-roles";
@@ -276,9 +277,10 @@ export function DirectoryUserDetailClient({
             nativeButton={false}
             variant="ghost"
             size="sm"
-            className="w-fit px-0 text-muted-foreground"
+            className="inline-flex w-fit items-center gap-1.5 px-0 text-muted-foreground"
           >
-            ← Back to {segmentLabel} directory
+            <ChevronLeft className="size-4 shrink-0" aria-hidden />
+            Back to {segmentLabel} directory
           </Button>
         </div>
 
@@ -556,9 +558,10 @@ export function DirectoryUserDetailClient({
           nativeButton={false}
           variant="ghost"
           size="sm"
-          className="w-fit px-0 text-muted-foreground"
+          className="inline-flex w-fit items-center gap-1.5 px-0 text-muted-foreground"
         >
-          ← Back to {segmentLabel} directory
+          <ChevronLeft className="size-4 shrink-0" aria-hidden />
+          Back to {segmentLabel} directory
         </Button>
       </div>
 

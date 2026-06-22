@@ -166,13 +166,6 @@ export async function PATCH(
     );
   }
 
-  if (dateJoined !== undefined && role !== "client") {
-    return NextResponse.json(
-      { error: "date_joined can only be updated for client profiles" },
-      { status: 400 },
-    );
-  }
-
   const patch: Record<string, unknown> = {
     updated_at: new Date().toISOString(),
   };

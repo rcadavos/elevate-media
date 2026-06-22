@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 
 const roleDescriptions: Record<DirectoryRole, string> = {
   admin: "Manage users, audit logs, and admin operations.",
-  client: "Open the client workspace to track delivery and updates.",
   sales: "Jump into pipeline activity and outreach tracking.",
   finance: "Review payments, projections, and finance operations.",
   operations: "Access standups, tasks, and weekly operational flow.",
@@ -45,7 +44,7 @@ export default async function PortalsPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-8 sm:px-6 sm:py-12">
+    <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col">
       <div className="max-w-2xl">
         <h1 className="text-3xl font-semibold tracking-tight text-foreground">
           Choose your portal
@@ -77,6 +76,6 @@ export default async function PortalsPage() {
           </Card>
         ))}
       </section>
-    </main>
+    </div>
   );
 }

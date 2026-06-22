@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronLeft, Menu, Search, X } from "lucide-react";
 import { AdminNavSearch } from "@/components/admin/admin-nav-search";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -61,15 +62,18 @@ export function ResponsiveAppSidebar({ children }: ResponsiveAppSidebarProps) {
         <Link
           href="/admin/dashboard"
           className={cn(
-            "relative z-0 flex min-w-0 flex-1 flex-col leading-tight transition-opacity duration-200",
+            "relative z-0 flex min-w-0 flex-1 items-center gap-2 transition-opacity duration-200",
             searchExpanded && "pointer-events-none opacity-0",
           )}
         >
-          <span className="block truncate text-xs font-semibold tracking-tight text-primary">
-            elev8temedia
-          </span>
-          <span className="block truncate text-[10px] font-medium text-muted-foreground">
-            Admin Portal
+          <BrandLogo size={30} />
+          <span className="flex min-w-0 flex-col leading-tight">
+            <span className="block truncate text-xs font-semibold tracking-tight text-primary">
+              elev8temedia
+            </span>
+            <span className="block truncate text-[10px] font-medium text-muted-foreground">
+              Admin Portal
+            </span>
           </span>
         </Link>
 

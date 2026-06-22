@@ -132,23 +132,12 @@ export function DirectoryTable({
   const [search, setSearch] = useState("");
   const [statusIncludeActive, setStatusIncludeActive] = useState(true);
   const [statusIncludeInactive, setStatusIncludeInactive] = useState(true);
-  const [statusIncludePending, setStatusIncludePending] = useState(true);
-  const [statusIncludeCompleted, setStatusIncludeCompleted] = useState(true);
-  const isClientRole = role === "client";
 
-  const statusSelectedCount = isClientRole
-    ? (statusIncludePending ? 1 : 0) + (statusIncludeCompleted ? 1 : 0)
-    : (statusIncludeActive ? 1 : 0) + (statusIncludeInactive ? 1 : 0);
+  const statusSelectedCount =
+    (statusIncludeActive ? 1 : 0) + (statusIncludeInactive ? 1 : 0);
 
   const filteredRows = useMemo(() => {
     let next = rows.filter((r) => {
-      if (isClientRole) {
-        const onboardingStatus = r.onboarding_status ?? "completed";
-        if (onboardingStatus === "pending" && statusIncludePending) return true;
-        if (onboardingStatus === "completed" && statusIncludeCompleted) return true;
-        return false;
-      }
-
       const active = r.is_active !== false;
       if (active && statusIncludeActive) return true;
       if (!active && statusIncludeInactive) return true;
@@ -159,22 +148,11 @@ export function DirectoryTable({
       next = next.filter((r) => {
         const name = (r.full_name ?? "").toLowerCase();
         const email = (r.email ?? "").toLowerCase();
-        const business = (r.business_name ?? "").toLowerCase();
-        return (
-          name.includes(q) || email.includes(q) || business.includes(q)
-        );
+        return name.includes(q) || email.includes(q);
       });
     }
     return next;
-  }, [
-    isClientRole,
-    rows,
-    search,
-    statusIncludeActive,
-    statusIncludeInactive,
-    statusIncludePending,
-    statusIncludeCompleted,
-  ]);
+  }, [rows, search, statusIncludeActive, statusIncludeInactive]);
 
   useEffect(() => {
     setPagination((p) => ({ ...p, pageIndex: 0 }));
@@ -184,8 +162,6 @@ export function DirectoryTable({
     search,
     statusIncludeActive,
     statusIncludeInactive,
-    statusIncludePending,
-    statusIncludeCompleted,
     sorting,
   ]);
 
@@ -193,14 +169,9 @@ export function DirectoryTable({
     const nameColumn: ColumnDef<ProfileRow> = {
       id: "full_name",
       accessorFn: (row) => row.full_name?.trim() || "",
-      meta: {
-        directoryLabel: role === "client" ? "Client name" : "Name",
-      },
+      meta: { directoryLabel: "Name" },
       header: ({ column }) => (
-        <DirectorySortHeader
-          column={column}
-          label={role === "client" ? "Client name" : "Name"}
-        />
+        <DirectorySortHeader column={column} label="Name" />
       ),
       cell: ({ row }) => {
         const v = row.original.full_name?.trim();
@@ -261,104 +232,14 @@ export function DirectoryTable({
       },
     };
 
-    const nameEmail: ColumnDef<ProfileRow>[] = [nameColumn, emailColumn];
-
-    const businessColumn: ColumnDef<ProfileRow> = {
-      id: "business_name",
-      accessorFn: (row) => row.business_name?.trim() || "",
-      meta: { directoryLabel: "Business" },
-      header: ({ column }) => (
-        <DirectorySortHeader column={column} label="Business" />
-      ),
-      cell: ({ row }) => {
-        const logo = row.original.business_logo_url?.trim();
-        const v = row.original.business_name?.trim();
-        const href = adminDirectoryRowHref(role, row.original);
-        const text =
-          !v ? (
-            <span className="text-muted-foreground">—</span>
-          ) : !href ? (
-            <span className="text-foreground">{v}</span>
-          ) : (
-            <Link
-              href={href}
-              className="text-foreground no-underline hover:no-underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              {v}
-            </Link>
-          );
-        if (role !== "client") {
-          return text;
-        }
-        return (
-          <div className="flex min-w-0 items-center gap-2">
-            <span className="relative size-8 shrink-0 overflow-hidden rounded-md border border-border bg-muted">
-              {logo ? (
-                // eslint-disable-next-line @next/next/no-img-element -- remote storage URL
-                <img src={logo} alt="" className="size-full object-cover" />
-              ) : null}
-            </span>
-            <div className="min-w-0">{text}</div>
-          </div>
-        );
-      },
-    };
-
-    const addedColumn: ColumnDef<ProfileRow> = {
-      accessorKey: "created_at",
-      sortingFn: "datetime",
-      meta: { directoryLabel: "Added" },
-      header: ({ column }) => <DirectorySortHeader column={column} label="Added" />,
-      cell: ({ getValue }) => (
-        <span className="whitespace-nowrap text-muted-foreground">
-          {formatAdded(getValue() as string)}
-        </span>
-      ),
-    };
-
-    const statusOrOnboardingColumn: ColumnDef<ProfileRow> = {
+    const statusColumn: ColumnDef<ProfileRow> = {
       id: "is_active",
-      accessorFn: (row) =>
-        role === "client" ? row.onboarding_status ?? "completed" : row.is_active,
-      meta: {
-        directoryLabel: role === "client" ? "Onboarding status" : "Status",
-      },
+      accessorFn: (row) => row.is_active,
+      meta: { directoryLabel: "Status" },
       header: ({ column }) => (
-        <DirectorySortHeader
-          column={column}
-          label={role === "client" ? "Onboarding Status" : "Status"}
-        />
+        <DirectorySortHeader column={column} label="Status" />
       ),
-      cell: (ctx) => {
-        const { getValue } = ctx;
-        if (role === "client") {
-          const onboardingStatus = getValue() as "pending" | "completed";
-          const isPending = onboardingStatus === "pending";
-          const href = adminDirectoryRowHref(role, ctx.row.original);
-          const badge = (
-            <span
-              className={cn(
-                "inline-flex rounded-full border px-2 py-0.5 text-xs font-medium",
-                isPending
-                  ? "border-amber-500/40 bg-amber-500/10 text-amber-900 dark:text-amber-100"
-                  : "border-emerald-500/40 bg-emerald-500/10 text-emerald-900 dark:text-emerald-100",
-              )}
-            >
-              {isPending ? "Pending" : "Completed"}
-            </span>
-          );
-          if (href) {
-            return (
-              <Link
-                href={href}
-                className="inline-flex focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                {badge}
-              </Link>
-            );
-          }
-          return badge;
-        }
+      cell: ({ getValue }) => {
         const active = getValue() !== false;
         return (
           <span
@@ -375,35 +256,19 @@ export function DirectoryTable({
       },
     };
 
-    const dateJoinedColumn: ColumnDef<ProfileRow> = {
-      id: "date_joined",
-      accessorKey: "date_joined",
-      sortUndefined: "last",
+    const addedColumn: ColumnDef<ProfileRow> = {
+      accessorKey: "created_at",
       sortingFn: "datetime",
-      meta: { directoryLabel: "Date joined" },
-      header: ({ column }) => (
-        <DirectorySortHeader column={column} label="Date Joined" />
+      meta: { directoryLabel: "Added" },
+      header: ({ column }) => <DirectorySortHeader column={column} label="Added" />,
+      cell: ({ getValue }) => (
+        <span className="whitespace-nowrap text-muted-foreground">
+          {formatAdded(getValue() as string)}
+        </span>
       ),
-      cell: ({ getValue }) => {
-        const v = getValue() as string | null | undefined;
-        return (
-          <span className="whitespace-nowrap text-muted-foreground">
-            {v?.trim() ? formatAdded(v) : "—"}
-          </span>
-        );
-      },
     };
 
-    if (role === "client") {
-      return [
-        businessColumn,
-        ...nameEmail,
-        statusOrOnboardingColumn,
-        dateJoinedColumn,
-        addedColumn,
-      ];
-    }
-    return [...nameEmail, statusOrOnboardingColumn, addedColumn];
+    return [nameColumn, emailColumn, statusColumn, addedColumn];
   }, [role]);
 
   // TanStack Table: useReactTable is intentionally excluded from React Compiler memoization.
@@ -431,9 +296,7 @@ export function DirectoryTable({
         <div className="flex flex-col gap-3 border-b border-border bg-muted/30 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div className="min-w-0 flex-1 sm:max-w-md">
             <Label htmlFor={searchId} className="sr-only">
-              {isClientRole ?
-                "Search by name, email, or business"
-              : "Search by name or email"}
+              Search by name or email
             </Label>
             <div className="relative">
               <Search
@@ -443,11 +306,7 @@ export function DirectoryTable({
               <Input
                 id={searchId}
                 type="search"
-                placeholder={
-                  isClientRole ?
-                    "Search by name, email, or business"
-                  : "Search by name or email"
-                }
+                placeholder="Search by name or email"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-10"
@@ -462,11 +321,7 @@ export function DirectoryTable({
               <DropdownMenuTrigger
                 type="button"
                 disabled={isInitialLoading}
-                aria-label={
-                  isClientRole
-                    ? `Filter by onboarding status, ${statusSelectedCount} of 2 selected`
-                    : `Filter by status, ${statusSelectedCount} of 2 selected`
-                }
+                aria-label={`Filter by status, ${statusSelectedCount} of 2 selected`}
                 className={cn(
                   "inline-flex h-10 w-full min-w-0 items-center justify-between gap-2 rounded-sm border border-border bg-background px-3 text-sm font-medium text-foreground shadow-sm outline-none transition-[color,box-shadow]",
                   "sm:w-auto sm:justify-center",
@@ -495,28 +350,18 @@ export function DirectoryTable({
                 <ChevronDown className="size-4 shrink-0 text-muted-foreground" aria-hidden />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-44">
-                <DropdownMenuLabel>
-                  {isClientRole ? "Onboarding Status" : "Status"}
-                </DropdownMenuLabel>
+                <DropdownMenuLabel>Status</DropdownMenuLabel>
                 <DropdownMenuCheckboxItem
-                  checked={isClientRole ? statusIncludePending : statusIncludeActive}
-                  onCheckedChange={(next) =>
-                    isClientRole
-                      ? setStatusIncludePending(Boolean(next))
-                      : setStatusIncludeActive(Boolean(next))
-                  }
+                  checked={statusIncludeActive}
+                  onCheckedChange={(next) => setStatusIncludeActive(Boolean(next))}
                 >
-                  {isClientRole ? "Pending" : "Active"}
+                  Active
                 </DropdownMenuCheckboxItem>
                 <DropdownMenuCheckboxItem
-                  checked={isClientRole ? statusIncludeCompleted : statusIncludeInactive}
-                  onCheckedChange={(next) =>
-                    isClientRole
-                      ? setStatusIncludeCompleted(Boolean(next))
-                      : setStatusIncludeInactive(Boolean(next))
-                  }
+                  checked={statusIncludeInactive}
+                  onCheckedChange={(next) => setStatusIncludeInactive(Boolean(next))}
                 >
-                  {isClientRole ? "Completed" : "Inactive"}
+                  Inactive
                 </DropdownMenuCheckboxItem>
               </DropdownMenuContent>
               </DropdownMenu>

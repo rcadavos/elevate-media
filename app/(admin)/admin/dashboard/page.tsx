@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AdminDashboardContent } from "@/components/admin/admin-dashboard-content";
+import { getClients } from "@/lib/data/agency";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,10 +10,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const clients = await getClients();
+
   return (
     <div>
-      <AdminDashboardContent />
+      <AdminDashboardContent clients={clients} />
 
       <Card className="mt-12 max-w-full border-primary/20 bg-primary/5 shadow-sm">
         <CardHeader>

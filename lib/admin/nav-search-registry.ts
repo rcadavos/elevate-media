@@ -27,13 +27,6 @@ export const ADMIN_NAV_SEARCH_ITEMS: AdminNavSearchItem[] = [
     keywords: ["users", "team", "staff", "people"],
   },
   {
-    id: "directory-client",
-    title: "Directory — Clients",
-    subtitle: "Client accounts",
-    href: "/admin/directory/client",
-    keywords: ["client", "accounts", "brands"],
-  },
-  {
     id: "directory-sales",
     title: "Directory — Sales",
     subtitle: "Sales team",

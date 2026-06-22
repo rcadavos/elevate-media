@@ -81,13 +81,6 @@ export async function POST(
     return NextResponse.json({ error: "Invalid kind" }, { status: 400 });
   }
 
-  if (kind === "business_logo" && row.role !== "client") {
-    return NextResponse.json(
-      { error: "Business logo uploads are only for client profiles" },
-      { status: 400 },
-    );
-  }
-
   if (!ALLOWED_TYPES.includes(file.type as (typeof ALLOWED_TYPES)[number])) {
     return NextResponse.json(
       { error: "Use JPEG, PNG, WebP, or GIF (max 2 MB)" },

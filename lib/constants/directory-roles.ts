@@ -1,6 +1,5 @@
 export const DIRECTORY_ROLES = [
   "admin",
-  "client",
   "sales",
   "finance",
   "operations",
@@ -14,7 +13,6 @@ export function isDirectoryRole(value: string): value is DirectoryRole {
 
 export const DIRECTORY_ROLE_LABELS: Record<DirectoryRole, string> = {
   admin: "Admin",
-  client: "Client",
   sales: "Sales",
   finance: "Finance",
   operations: "Operations",

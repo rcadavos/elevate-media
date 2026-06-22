@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
 import { House, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -31,8 +32,9 @@ export function WorkspaceMobileNav() {
       <div className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-background/95 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 md:hidden">
         <Link
           href="/dashboard"
-          className="text-sm font-semibold tracking-tight text-foreground"
+          className="flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground"
         >
+          <BrandLogo size={28} />
           elev8temedia
         </Link>
         <div className="flex items-center gap-2">

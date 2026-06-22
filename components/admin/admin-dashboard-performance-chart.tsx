@@ -41,8 +41,8 @@ export function AdminDashboardPerformanceChart({
       const innerW = width - MARGIN.left - MARGIN.right;
       const innerH = height - MARGIN.top - MARGIN.bottom;
 
-      const thisColor = readCssVar(el, "--chart-1", "#0f766e");
-      const lastColor = readCssVar(el, "--chart-2", "#14b8a6");
+      const thisColor = readCssVar(el, "--chart-1", "#2563eb");
+      const lastColor = readCssVar(el, "--chart-2", "#60a5fa");
       const muted = readCssVar(el, "--muted-foreground", "#71717a");
       const border = readCssVar(el, "--border", "#e4e4e7");
       const surface = readCssVar(el, "--card", "#ffffff");

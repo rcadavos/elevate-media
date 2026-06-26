@@ -1,5 +1,9 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Live Demo
+
+The deployed app can be viewed at **[https://elevate-media-cyan.vercel.app/](https://elevate-media-cyan.vercel.app/)**.
+
 ## Getting Started
 
 First, run the development server:

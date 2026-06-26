@@ -1,6 +1,5 @@
 import { AdminDashboardDismissibleTip } from "@/components/admin/admin-dashboard-dismissible-tip";
 import { AdminDashboardPerformanceChart } from "@/components/admin/admin-dashboard-performance-chart";
-import { DashboardKpiValueBlock } from "@/components/dashboard/dashboard-kpi-value-block";
 import { DashboardSalesSection } from "@/components/dashboard/dashboard-sales-section";
 import { NeedsAttentionCardList } from "@/components/dashboard/needs-attention-card-list";
 import {
@@ -10,14 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  adminWeeklyPerformanceDemo,
-  dashboardKpis,
-  dashboardOperationalNotices,
-} from "@/lib/demo-data/dashboard";
-import { cn } from "@/lib/utils";
+import { agencyKpis, agencyNotices } from "@/lib/agency/dashboard-stats";
+import { adminWeeklyPerformanceDemo } from "@/lib/demo-data/dashboard";
+import type { AgencyClient } from "@/lib/types/agency";
 
-export function AdminDashboardContent() {
+export function AdminDashboardContent({ clients }: { clients: AgencyClient[] }) {
+  const kpis = agencyKpis(clients);
+  const notices = agencyNotices(clients);
+
   return (
     <div className="flex w-full min-w-0 flex-col gap-8">
       <header className="min-w-0">
@@ -26,8 +25,8 @@ export function AdminDashboardContent() {
             Admin dashboard
           </h1>
           <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            High-level view for running elev8temedia. Figures are demo data until
-            modules write real records.
+            High-level view for running elev8temedia. Client figures are from the
+            live roster; performance trends are demo until weekly data is logged.
           </p>
         </div>
       </header>
@@ -39,7 +38,7 @@ export function AdminDashboardContent() {
               Key metrics
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
-              {dashboardKpis.map((kpi) => (
+              {kpis.map((kpi) => (
                 <Card key={kpi.id} size="sm" className="shadow-sm">
                   <CardHeader className="pb-2">
                     <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -47,7 +46,10 @@ export function AdminDashboardContent() {
                     </p>
                   </CardHeader>
                   <CardContent className="pt-0">
-                    <DashboardKpiValueBlock kpi={kpi} />
+                    <p className="text-2xl font-semibold tabular-nums text-foreground">
+                      {kpi.value}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">{kpi.hint}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -97,9 +99,7 @@ export function AdminDashboardContent() {
         </div>
 
         <aside
-          className={cn(
-            "min-w-0 lg:col-span-1 lg:self-start",
-          )}
+          className="min-w-0 lg:col-span-1 lg:self-start"
           aria-labelledby="admin-dashboard-alerts-heading"
         >
           <h2
@@ -109,13 +109,9 @@ export function AdminDashboardContent() {
             Needs attention
           </h2>
           <p className="mt-0.5 text-sm text-muted-foreground">
-            Static examples — wire to Finance and Operations when data is live.
+            Operational signals from your roster.
           </p>
-          <NeedsAttentionCardList
-            items={dashboardOperationalNotices}
-            scope="admin"
-            layout="sidebar"
-          />
+          <NeedsAttentionCardList items={notices} scope="admin" layout="sidebar" />
           <AdminDashboardDismissibleTip />
         </aside>
       </div>

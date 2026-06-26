@@ -24,6 +24,13 @@ export type AdminSidebarProps = {
   avatarUrl?: string | null;
 };
 
+const AGENCY_LINKS = [
+  { href: "/admin/clients", label: "Clients" },
+  { href: "/admin/meta", label: "Meta Tracking" },
+  { href: "/admin/goals", label: "Goals" },
+  { href: "/admin/sops", label: "Playbooks" },
+] as const;
+
 export function AdminSidebar({ email, fullName, avatarUrl }: AdminSidebarProps) {
   const pathname = usePathname();
 
@@ -52,18 +59,30 @@ export function AdminSidebar({ email, fullName, avatarUrl }: AdminSidebarProps) 
           >
             Dashboard
           </Button>
-          <Button
-            render={<Link href="/admin/audit-logs" />}
-            nativeButton={false}
-            variant={auditLogsActive ? "default" : "ghost"}
-            className={cn(
-              "h-10 min-h-10 justify-start px-2.5 text-sm",
-              !auditLogsActive && "font-normal",
-            )}
-          >
-            Audit logs
-          </Button>
         </SidebarNav>
+
+        <SidebarSection title="Agency">
+          <SidebarMenu>
+            {AGENCY_LINKS.map(({ href, label }) => {
+              const active = pathname === href || pathname.startsWith(`${href}/`);
+              return (
+                <li key={href}>
+                  <Button
+                    render={<Link href={href} />}
+                    nativeButton={false}
+                    variant={active ? "default" : "ghost"}
+                    className={cn(
+                      "h-10 min-h-10 w-full justify-start px-2.5 text-sm",
+                      !active && "font-normal",
+                    )}
+                  >
+                    {label}
+                  </Button>
+                </li>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarSection>
 
         <SidebarSection title="Directory">
           <SidebarMenu>
@@ -90,6 +109,20 @@ export function AdminSidebar({ email, fullName, avatarUrl }: AdminSidebarProps) 
           </SidebarMenu>
         </SidebarSection>
       </SidebarBody>
+
+      <div className="shrink-0">
+        <Button
+          render={<Link href="/admin/audit-logs" />}
+          nativeButton={false}
+          variant={auditLogsActive ? "default" : "ghost"}
+          className={cn(
+            "h-10 min-h-10 w-full justify-start px-2.5 text-sm",
+            !auditLogsActive && "font-normal",
+          )}
+        >
+          Audit logs
+        </Button>
+      </div>
 
       <SidebarFooter>
         <SidebarAccountMenu

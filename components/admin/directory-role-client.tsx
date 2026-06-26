@@ -23,18 +23,7 @@ export function DirectoryRoleClient({ role }: DirectoryRoleClientProps) {
   const isInitialLoading =
     profilesQuery.isPending && profilesQuery.data === undefined;
 
-  let segmentSubheader: string;
-  if (role === "client") {
-    let completed = 0;
-    let pending = 0;
-    for (const r of rows) {
-      if (r.onboarding_status === "pending") pending += 1;
-      else completed += 1;
-    }
-    segmentSubheader = `${completed} Completed, ${pending} Pending`;
-  } else {
-    segmentSubheader = `${rows.length} user${rows.length === 1 ? "" : "s"} in this segment.`;
-  }
+  const segmentSubheader = `${rows.length} user${rows.length === 1 ? "" : "s"} in this segment.`;
 
   return (
     <div>

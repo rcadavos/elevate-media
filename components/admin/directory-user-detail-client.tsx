@@ -30,16 +30,6 @@ function normalizeProfile(p: ProfileRow): ProfileRow {
   return { ...p, is_active: p.is_active !== false };
 }
 
-function isoToLocalDateInput(iso: string | null | undefined): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  const y = d.getFullYear();
-  const mo = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${mo}-${day}`;
-}
-
 export function DirectoryUserDetailClient({
   role,
   profile: initialProfile,
@@ -59,18 +49,8 @@ export function DirectoryUserDetailClient({
   const [draftName, setDraftName] = useState(
     () => initialProfile.full_name ?? "",
   );
-  const [draftBusinessName, setDraftBusinessName] = useState(
-    () => initialProfile.business_name ?? "",
-  );
   const [draftActive, setDraftActive] = useState(
     () => initialProfile.is_active !== false,
-  );
-  const [draftDateJoined, setDraftDateJoined] = useState(() =>
-    role === "client"
-      ? isoToLocalDateInput(
-          initialProfile.date_joined ?? initialProfile.created_at,
-        )
-      : "",
   );
 
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
@@ -84,30 +64,12 @@ export function DirectoryUserDetailClient({
         role,
         full_name: draftName.trim(),
         is_active: draftActive,
-        ...(role === "client"
-          ? {
-              business_name: draftBusinessName.trim() || null,
-              date_joined:
-                draftDateJoined.trim() ||
-                isoToLocalDateInput(
-                  displayProfile.date_joined ?? displayProfile.created_at,
-                ),
-            }
-          : {}),
       }),
     onSuccess: (updated) => {
       setEditError(null);
       mergeProfileIntoRoleCache(queryClient, role, updated);
       setDraftName(updated.full_name ?? "");
-      setDraftBusinessName(updated.business_name ?? "");
       setDraftActive(updated.is_active !== false);
-      if (role === "client") {
-        setDraftDateJoined(
-          isoToLocalDateInput(
-            updated.date_joined ?? updated.created_at,
-          ),
-        );
-      }
       setEditing(false);
     },
     onError: (err: Error) => {
@@ -176,30 +138,14 @@ export function DirectoryUserDetailClient({
   const startEdit = () => {
     setEditError(null);
     setDraftName(displayProfile.full_name ?? "");
-    setDraftBusinessName(displayProfile.business_name ?? "");
     setDraftActive(displayProfile.is_active);
-    if (role === "client") {
-      setDraftDateJoined(
-        isoToLocalDateInput(
-          displayProfile.date_joined ?? displayProfile.created_at,
-        ),
-      );
-    }
     setEditing(true);
   };
 
   const cancelEdit = () => {
     setEditError(null);
     setDraftName(displayProfile.full_name ?? "");
-    setDraftBusinessName(displayProfile.business_name ?? "");
     setDraftActive(displayProfile.is_active);
-    if (role === "client") {
-      setDraftDateJoined(
-        isoToLocalDateInput(
-          displayProfile.date_joined ?? displayProfile.created_at,
-        ),
-      );
-    }
     setEditing(false);
   };
 
@@ -246,291 +192,6 @@ export function DirectoryUserDetailClient({
     },
     [initialProfile.id, queryClient, role],
   );
-
-  if (role === "client") {
-    const businessDisplay =
-      displayProfile.business_name?.trim() || "—";
-    const clientNameDisplay =
-      displayProfile.full_name?.trim() || "—";
-    const dateJoinedViewLabel = new Date(
-      displayProfile.date_joined ?? displayProfile.created_at,
-    ).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-    const dateAddedLabel = new Date(displayProfile.created_at).toLocaleDateString(
-      undefined,
-      {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      },
-    );
-    const photoBusy = patchMutation.isPending;
-
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <Button
-            render={<Link href={`/admin/directory/${role}`} />}
-            nativeButton={false}
-            variant="ghost"
-            size="sm"
-            className="inline-flex w-fit items-center gap-1.5 px-0 text-muted-foreground"
-          >
-            <ChevronLeft className="size-4 shrink-0" aria-hidden />
-            Back to {segmentLabel} directory
-          </Button>
-        </div>
-
-        <Card>
-          <CardContent className="space-y-0 p-6 sm:p-8">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div className="flex min-w-0 flex-1 flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:gap-5 sm:text-left">
-                <div className="shrink-0 self-center sm:self-auto">
-                  <ClientProfilePhotoSlot
-                    kind="business_logo"
-                    url={displayProfile.business_logo_url}
-                    disabled={photoBusy}
-                    variant="square"
-                    onPickFile={(file) => handleAdminProfilePhoto("business_logo", file)}
-                  />
-                </div>
-                <div className="w-full min-w-0 flex-1 space-y-1 sm:w-auto">
-                  {editing ? (
-                    <Input
-                      id={`dir-client-business-${initialProfile.id}`}
-                      value={draftBusinessName}
-                      onChange={(e) => setDraftBusinessName(e.target.value)}
-                      disabled={patchMutation.isPending}
-                      autoComplete="organization"
-                      placeholder="Business name"
-                      aria-label="Business name"
-                      className="h-11 min-h-11 shrink-0 py-1 text-center text-lg font-semibold leading-tight sm:h-9 sm:py-1 sm:text-left"
-                    />
-                  ) : (
-                    <p className="truncate text-xl font-semibold tracking-tight text-foreground">
-                      {businessDisplay}
-                    </p>
-                  )}
-                  <p className="font-mono text-xs text-muted-foreground break-all text-center sm:text-left">
-                    {displayProfile.id}
-                  </p>
-                </div>
-              </div>
-              <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
-                {!editing ? (
-                  <div className="flex w-full gap-2 sm:contents">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="toolbar"
-                      disabled={sendMutation.isPending}
-                      className="min-h-11 min-w-0 flex-1 basis-0 sm:h-9 sm:flex-none sm:basis-auto"
-                      onClick={() => {
-                        setSendError(null);
-                        setNotice(null);
-                        setInviteUrl(null);
-                        sendMutation.mutate();
-                      }}
-                    >
-                      {sendMutation.isPending ? "Working…" : resendLabel}
-                    </Button>
-                    <Button
-                      type="button"
-                      size="toolbar"
-                      className="min-h-11 min-w-0 flex-1 basis-0 sm:h-9 sm:flex-none sm:basis-auto"
-                      onClick={startEdit}
-                    >
-                      Edit
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex w-full gap-2 sm:contents">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="toolbar"
-                      disabled={sendMutation.isPending}
-                      className="min-h-11 min-w-0 flex-[2] basis-0 sm:h-9 sm:flex-none sm:basis-auto"
-                      onClick={() => {
-                        setSendError(null);
-                        setNotice(null);
-                        setInviteUrl(null);
-                        sendMutation.mutate();
-                      }}
-                    >
-                      {sendMutation.isPending ? "Working…" : resendLabel}
-                    </Button>
-                    <Button
-                      type="button"
-                      size="toolbar"
-                      disabled={patchMutation.isPending}
-                      className="min-h-11 min-w-0 flex-1 basis-0 sm:h-9 sm:flex-none sm:basis-auto"
-                      onClick={() => patchMutation.mutate()}
-                    >
-                      {patchMutation.isPending ? "Saving…" : "Save"}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="toolbar"
-                      disabled={patchMutation.isPending}
-                      className="min-h-11 min-w-0 flex-1 basis-0 sm:h-9 sm:flex-none sm:basis-auto"
-                      onClick={cancelEdit}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div
-              className="my-6 border-b border-border"
-              role="separator"
-              aria-hidden
-            />
-
-            <div className="mt-8 space-y-4">
-              <div className="grid grid-cols-1 gap-1 sm:grid-cols-[minmax(0,11rem)_1fr] sm:items-center sm:gap-6">
-                <div className="text-sm text-muted-foreground">Avatar</div>
-                <div className="min-w-0">
-                  <ClientProfilePhotoSlot
-                    kind="avatar"
-                    url={displayProfile.avatar_url}
-                    disabled={photoBusy}
-                    variant="round"
-                    compact
-                    onPickFile={(file) => handleAdminProfilePhoto("avatar", file)}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-1 sm:grid-cols-[minmax(0,11rem)_1fr] sm:items-center sm:gap-6">
-                <div className="text-sm text-muted-foreground">Client name</div>
-                <div className="min-w-0">
-                  {editing ? (
-                    <Input
-                      id={`dir-client-name-${initialProfile.id}`}
-                      value={draftName}
-                      onChange={(e) => setDraftName(e.target.value)}
-                      disabled={patchMutation.isPending}
-                      autoComplete="name"
-                      className="max-w-md font-medium"
-                    />
-                  ) : (
-                    <p className="text-sm font-medium text-foreground">
-                      {clientNameDisplay}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-1 sm:grid-cols-[minmax(0,11rem)_1fr] sm:items-center sm:gap-6">
-                <div className="text-sm text-muted-foreground">Active profile</div>
-                <div className="min-w-0">
-                  {editing ? (
-                    <fieldset className="border-0 p-0">
-                      <legend className="sr-only">Active profile</legend>
-                      <div className="flex flex-row flex-wrap gap-6">
-                        <label className="flex cursor-pointer items-center gap-2 text-sm text-foreground">
-                          <input
-                            type="radio"
-                            name={activeRadioName}
-                            checked={draftActive}
-                            onChange={() => setDraftActive(true)}
-                            disabled={patchMutation.isPending}
-                            className="size-4 accent-primary"
-                          />
-                          Yes
-                        </label>
-                        <label className="flex cursor-pointer items-center gap-2 text-sm text-foreground">
-                          <input
-                            type="radio"
-                            name={activeRadioName}
-                            checked={!draftActive}
-                            onChange={() => setDraftActive(false)}
-                            disabled={patchMutation.isPending}
-                            className="size-4 accent-primary"
-                          />
-                          No
-                        </label>
-                      </div>
-                    </fieldset>
-                  ) : (
-                    <p className="text-sm font-medium text-foreground">
-                      {displayProfile.is_active ? "Yes" : "No"}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-1 sm:grid-cols-[minmax(0,11rem)_1fr] sm:items-center sm:gap-6">
-                <div className="text-sm text-muted-foreground">Email</div>
-                <div className="min-w-0 break-all text-sm font-medium text-foreground">
-                  {displayProfile.email ?? "—"}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-1 sm:grid-cols-[minmax(0,11rem)_1fr] sm:items-start sm:gap-6">
-                <Label
-                  htmlFor={`dir-client-date-joined-${initialProfile.id}`}
-                  className="text-sm text-muted-foreground sm:pt-2"
-                >
-                  Date joined
-                </Label>
-                <div className="min-w-0">
-                  {editing ? (
-                    <Input
-                      id={`dir-client-date-joined-${initialProfile.id}`}
-                      type="date"
-                      value={draftDateJoined}
-                      onChange={(e) => setDraftDateJoined(e.target.value)}
-                      disabled={patchMutation.isPending}
-                      className="max-w-md font-medium"
-                    />
-                  ) : (
-                    <p className="text-sm font-medium text-foreground sm:pt-2">
-                      {dateJoinedViewLabel}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-1 sm:grid-cols-[minmax(0,11rem)_1fr] sm:items-start sm:gap-6">
-                <div className="text-sm text-muted-foreground sm:pt-2">Date added</div>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-foreground sm:pt-2">
-                    {dateAddedLabel}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {editError ? (
-              <Alert variant="destructive" className="mt-6">
-                <AlertTitle>Could not save</AlertTitle>
-                <AlertDescription>{editError}</AlertDescription>
-              </Alert>
-            ) : null}
-
-            {sentLabel ? (
-              <div className="mt-6 border-t border-border pt-6 text-sm">
-                <span className="text-muted-foreground">Last onboarding sent</span>
-                <p className="mt-1 font-medium text-foreground">{sentLabel}</p>
-              </div>
-            ) : null}
-
-            <div className="mt-6 space-y-3 border-t border-border pt-6">
-              {onboardingBlock}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   const staffNameDisplay = displayProfile.full_name?.trim() || "—";
   const staffDateJoinedViewLabel = new Date(

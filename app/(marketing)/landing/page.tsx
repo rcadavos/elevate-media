@@ -56,13 +56,13 @@ export default function LandingPage() {
             className="pointer-events-none absolute inset-0 opacity-40 dark:opacity-50"
             aria-hidden
           >
-            <div className="absolute -left-24 -top-20 h-80 w-80 rounded-full bg-teal-500/15 blur-3xl dark:bg-[#36f4a4]/10" />
-            <div className="absolute bottom-0 right-[-10%] h-112 w-md rounded-full bg-emerald-600/10 blur-3xl dark:bg-[#102620]/80" />
-            <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-500/5 blur-3xl dark:bg-[#061a1c]/60" />
+            <div className="absolute -left-24 -top-20 h-80 w-80 rounded-full bg-blue-500/15 blur-3xl dark:bg-blue-500/10" />
+            <div className="absolute bottom-0 right-[-10%] h-112 w-md rounded-full bg-blue-600/10 blur-3xl dark:bg-[#13233f]/80" />
+            <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-500/5 blur-3xl dark:bg-[#0c1322]/60" />
           </div>
 
           <div className="relative mx-auto max-w-6xl px-4 pb-20 pt-14 sm:px-6 sm:pb-24 sm:pt-20">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary dark:border-[#36f4a4]/35 dark:bg-white/10 dark:text-[#c1fbd4]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary dark:border-blue-400/35 dark:bg-white/10 dark:text-blue-200">
               Meta · SMS · Site optimization
             </div>
             <h1 className="mt-6 max-w-4xl text-4xl font-light tracking-tight text-balance sm:text-5xl sm:leading-[1.06] lg:text-[3.25rem]">
@@ -100,12 +100,12 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="border-b border-border bg-muted/40 py-14 dark:bg-[#061a1c]/40">
+        <section className="border-b border-border bg-muted/40 py-14 dark:bg-[#0c1322]/40">
           <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:grid-cols-3 sm:gap-8 sm:px-6">
             {pillars.map((p) => (
               <div key={p.title} className="relative pl-4 sm:pl-5">
                 <span
-                  className="absolute left-0 top-1.5 h-[calc(100%-0.25rem)] w-0.5 rounded-full bg-linear-to-b from-primary to-teal-600/70 opacity-90 dark:from-[#36f4a4] dark:to-teal-800/80"
+                  className="absolute left-0 top-1.5 h-[calc(100%-0.25rem)] w-0.5 rounded-full bg-linear-to-b from-primary to-blue-600/70 opacity-90 dark:from-[#60a5fa] dark:to-blue-800/80"
                   aria-hidden
                 />
                 <h2 className="text-base font-semibold tracking-tight text-foreground">
@@ -137,7 +137,7 @@ export default function LandingPage() {
             {modules.map((m, i) => (
               <li
                 key={m.name}
-                className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm transition hover:border-primary/35 hover:shadow-md dark:hover:border-[#36f4a4]/25"
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm transition hover:border-primary/35 hover:shadow-md dark:hover:border-blue-400/25"
               >
                 <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                   {String(i + 1).padStart(2, "0")}
@@ -148,7 +148,7 @@ export default function LandingPage() {
                 <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
                   {m.description}
                 </p>
-                <span className="mt-4 text-xs font-medium text-primary opacity-0 transition group-hover:opacity-100 dark:text-[#36f4a4]">
+                <span className="mt-4 text-xs font-medium text-primary opacity-0 transition group-hover:opacity-100 dark:text-blue-300">
                   Explore in the live demo →
                 </span>
               </li>
@@ -156,12 +156,12 @@ export default function LandingPage() {
           </ul>
         </section>
 
-        <section className="relative overflow-hidden border-t border-border bg-muted py-16 text-foreground dark:bg-linear-to-br dark:from-[#102620] dark:via-[#061a1c] dark:to-[#000000] dark:text-white">
+        <section className="relative overflow-hidden border-t border-border bg-muted py-16 text-foreground dark:bg-linear-to-br dark:from-[#13233f] dark:via-[#0c1322] dark:to-[#060912] dark:text-white">
           <div
             className="pointer-events-none absolute inset-0 opacity-30 dark:opacity-40"
             aria-hidden
           >
-            <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-primary/20 blur-3xl dark:bg-[#36f4a4]/15" />
+            <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-primary/20 blur-3xl dark:bg-blue-500/15" />
           </div>
           <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-8 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div className="max-w-xl">
@@ -197,7 +197,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-border bg-muted/40 py-8 text-sm text-muted-foreground dark:bg-[#061a1c]/30">
+      <footer className="border-t border-border bg-muted/40 py-8 text-sm text-muted-foreground dark:bg-[#0c1322]/30">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p>© {new Date().getFullYear()} elev8temedia. All rights reserved.</p>
           <p className="text-xs sm:text-sm">

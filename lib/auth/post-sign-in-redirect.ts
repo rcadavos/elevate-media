@@ -12,7 +12,6 @@ export const DEFAULT_SIGNED_IN_PATH = "/dashboard" as const;
 
 const ROLE_PORTAL_PATHS: Record<DirectoryRole, string> = {
   admin: ADMIN_HOME_PATH,
-  client: "/client/hub",
   sales: "/sales",
   finance: "/finance",
   operations: "/operations",
@@ -30,7 +29,6 @@ export function isSafeAuthRedirectPath(path: string): boolean {
     "/dashboard",
     "/portals",
     "/admin",
-    "/client",
     "/sales",
     "/finance",
     "/operations",

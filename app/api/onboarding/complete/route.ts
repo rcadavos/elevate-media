@@ -113,85 +113,11 @@ export async function POST(request: Request) {
     });
   }
 
-  if (role !== "client") {
-    return NextResponse.json(
-      { error: "This invite type is only completed for client accounts." },
-      { status: 400 },
-    );
-  }
-
-  if (!fullName) {
-    return NextResponse.json({ error: "Full name is required" }, { status: 400 });
-  }
-
-  const inviteEmail =
-    typeof invite.email === "string" && invite.email.trim()
-      ? invite.email.trim().toLowerCase()
-      : "";
-
-  if (!inviteEmail) {
-    return NextResponse.json({ error: "Invite is missing email" }, { status: 500 });
-  }
-
-  const businessNameRaw = invite.business_name;
-  const businessName =
-    typeof businessNameRaw === "string" && businessNameRaw.trim()
-      ? businessNameRaw.trim()
-      : "";
-
-  const { data: created, error: createErr } = await admin.auth.admin.createUser({
-    email: inviteEmail,
-    password,
-    email_confirm: true,
-    user_metadata: {
-      full_name: fullName,
-      role: "client",
-      ...(businessName ? { business_name: businessName } : {}),
-    },
-  });
-
-  if (createErr || !created.user?.id) {
-    return NextResponse.json(
-      { error: createErr?.message ?? "Could not create account" },
-      { status: 400 },
-    );
-  }
-
-  const newUserId = created.user.id;
-
-  const inviteDateJoinedRaw = invite.date_joined;
-  const inviteDateJoined =
-    typeof inviteDateJoinedRaw === "string" && inviteDateJoinedRaw.trim()
-      ? inviteDateJoinedRaw.trim()
-      : null;
-
-  const { error: profErr } = await admin
-    .from("profiles")
-    .update({
-      full_name: fullName,
-      role: "client",
-      business_name: businessName || null,
-      date_joined: inviteDateJoined ?? consumedAt,
-      updated_at: consumedAt,
-    })
-    .eq("id", newUserId);
-
-  if (profErr) {
-    return NextResponse.json({ error: profErr.message }, { status: 500 });
-  }
-
-  await admin
-    .from("onboarding_invites")
-    .update({
-      consumed_at: consumedAt,
-      user_id: newUserId,
-    })
-    .eq("id", invite.id);
-
-  const email = created.user.email ?? inviteEmail;
-
-  return NextResponse.json({
-    ok: true as const,
-    email,
-  });
+  // Invites without a linked auth user are no longer supported (client
+  // self-signup was removed). Team members are created first via
+  // /api/admin/users, then sent an onboarding link, so invite.user_id is set.
+  return NextResponse.json(
+    { error: "This invite has no linked account." },
+    { status: 400 },
+  );
 }

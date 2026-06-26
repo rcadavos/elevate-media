@@ -9,6 +9,7 @@ import { LayoutDashboard, LogIn, Menu, PanelRight, UserPlus, X } from "lucide-re
 import { resolvePostSignInPath } from "@/lib/auth/post-sign-in-redirect";
 import { fetchSessionSummaryIfAuthenticated } from "@/lib/query/session-summary";
 import { queryKeys } from "@/lib/query/query-keys";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -44,9 +45,10 @@ export function MarketingHeader() {
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
-      <header className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 dark:bg-[#061a1c]/90 dark:supports-[backdrop-filter]:bg-[#061a1c]/75">
+      <header className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 dark:bg-background/90 dark:supports-[backdrop-filter]:bg-background/75">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
-          <Link href="/landing" className="group flex min-w-0 items-baseline gap-2">
+          <Link href="/landing" className="group flex min-w-0 items-center gap-2">
+            <BrandLogo size={30} />
             <span className="text-sm font-semibold tracking-tight text-foreground transition group-hover:text-primary">
               elev8temedia
             </span>
